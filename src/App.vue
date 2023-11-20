@@ -4,5 +4,5 @@
 </template>
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
-import SidebarNavigationComponent from 'components/SidebarNavigationComponent.vue'
+import SidebarNavigationComponent from '@/components/Sidebar/SidebarNavigationComponent.vue'
 </script>
