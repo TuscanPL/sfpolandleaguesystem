@@ -1,6 +1,6 @@
 <template>
     <div>
-        Nothing here yet
+        Home in the making...
     </div>
 </template>
 <script setup lang="ts">
