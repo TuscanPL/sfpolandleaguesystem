@@ -1,6 +1,10 @@
 <template>
-  <SidebarNavigationComponent />
-  <RouterView />
+  <div class="basis-16 left-0">
+    <SidebarNavigationComponent class="relative left-0" />
+  </div>
+  <div class="basis-auto w-full">
+    <RouterView />
+  </div>
 </template>
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
