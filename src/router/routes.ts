@@ -3,7 +3,7 @@ const leagueStandings = () => import('@/views/LeagueStandingsView.vue')
 const reportScores = () => import('@/views/ReportScoresView.vue')
 const upcomingMatches = () => import('@/views/UpcomingMatchesView.vue')
 const userSettings = () => import('@/views/UserSettingsView.vue')
-const signUp = () => import('@/views/SignUp.vue')
+const signUp = () => import('@/views/SignUpView.vue')
 
 const routerPaths = {
   home: '/',
