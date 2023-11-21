@@ -1,8 +1,8 @@
 <template>
-  <fwb-alert type="success" v-if="showSuccessAlert"> "Zostałeś zapisany!" </fwb-alert>
-  <fwb-select v-model="selected" :options="league" label="Liga" />
-  <fwb-toast divide v-if="selected">Zapisy zakończą się {{ getEndDate(selected) }}.</fwb-toast>
-  <fwb-button gradient="red" @click="submitForm">Zapisz się</fwb-button>
+<fwb-alert type=success v-if=showSuccessAlert>Zostałeś zapisany!</fwb-alert>
+<fwb-select v-model=selected :options=league label=Liga />
+<fwb-toast divide v-if=selected>Zapisy zakończą się {{getEndDate(selected)}}.</fwb-toast>
+<fwb-button gradient=red @click=submitForm>Zapisz się</fwb-button>
 </template>
 
 <script lang="ts" setup>
