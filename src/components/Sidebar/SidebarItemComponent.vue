@@ -4,7 +4,7 @@
             <v-icon :name="icon" />
         </template>
         <template #default>
-            <span class="sidebar-option-label">{{ label }}</span>
+            <span class="font-medium">{{ label }}</span>
         </template>
     </fwb-sidebar-item>
 </template>
@@ -18,8 +18,3 @@ interface Props {
 
 defineProps<Props>();
 </script>
-<style scoped>
-.sidebar-option-label {
-    font-weight: 500;
-}
-</style>
