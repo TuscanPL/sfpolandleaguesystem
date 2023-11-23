@@ -29,19 +29,19 @@
       @click="goTo(routerPaths.signUp)"
     />
 
-    <div class="flex flex-col items-start fixed bottom-0 left-0">
-      <fwb-card @click="handleToggleButton" class="static z-50">
-        <div class="flex items-center static w-60 p-2">
+    <div class="flex flex-row fixed items-center bottom-0 left-0 w-full">
+      <fwb-card @click="handleToggleButton" class="z-50 w-64">
+        <div class="flex items-center p-2">
           <fwb-avatar :img="userStore.user?.avatarUrl" rounded />
           <p class="font-normal text-gray-700 dark:text-gray-400 ml-4">
             {{ userStore.user?.globalName }}
           </p>
         </div>
       </fwb-card>
-      <div class="absolute w-full transition-transform h-full" :class="buttonClasses">
+      <div class="absolute w-full transition-transform" :class="buttonClasses">
         <fwb-button
           gradient="red"
-          class="h-full z-0 ml-3.5 square"
+          class="z-0 ml-5 square"
           v-if="userStore.user"
           @click="handleLogout"
         >
@@ -71,9 +71,9 @@ async function handleLogout() {
 }
 
 const buttonClasses = computed(() => ({
-  'z-[1]': !isButtonTransformed.value,
+  'z-1': !isButtonTransformed.value,
   'translate-x-0': !isButtonTransformed.value,
-  'translate-x-full z-[2]': isButtonTransformed.value
+  'translate-x-60': isButtonTransformed.value
 }))
 
 function handleToggleButton() {
