@@ -1,44 +1,50 @@
-import { mapLeagueDbModelToLeague } from "@/common/mapper";
-import { supabase } from "@/common/supabase";
-import type { League } from "@/models/app/leagueModel";
-import { defineStore } from "pinia";
-import { ref } from "vue";
+import { mapLeagueDbModelToLeague } from '@/common/mapper'
+import { supabase } from '@/common/supabase'
+import type { League } from '@/models/app/leagueModel'
+import { defineStore } from 'pinia'
+import { ref } from 'vue'
 
 export const useLeaguesStore = defineStore('leaguesStore', () => {
-    const leagues = ref<League[]>([]);
+  const leagues = ref<League[]>([])
 
-    async function initalizeLeagues() {
-        const { data } = await supabase
-            .from('leagues')
-            .select(`
+  async function initalizeLeagues(): Promise<any> {
+    const { data } = await supabase.from('leagues').select(`
                 *,
                 league_sign_ups (
                     *
                 )
             `)
-        
-        if (!data)
-            return
 
-        leagues.value = data.map<League>((league: any) => mapLeagueDbModelToLeague(league))
-    }
+    if (!data) return Promise.reject()
 
-    async function signUpForLeague(leagueId: number, discordName: string, avatarUrl: string) {
-        await supabase.from('league_sign_ups').insert({
-            league_id: leagueId,
-            discord_name: discordName,
-            avatar_url: avatarUrl
-        })
-    }
+    leagues.value = data.map<League>((league: any) => mapLeagueDbModelToLeague(league))
+    return Promise.resolve()
+  }
 
-    async function signOutFromLeague(leagueId: number, discordName: string) {
-        await supabase.from('league_sign_ups').delete().eq('league_id', leagueId).eq('discord_name', discordName)
-    }
+  async function signUpForLeague(
+    leagueId: number,
+    discordName: string,
+    avatarUrl: string
+  ): Promise<any> {
+    return await supabase.from('league_sign_ups').insert({
+      league_id: leagueId,
+      discord_name: discordName,
+      avatar_url: avatarUrl
+    })
+  }
 
-    return {
-        signUpForLeague,
-        initalizeLeagues,
-        signOutFromLeague,
-        leagues
-    }
+  async function signOutFromLeague(leagueId: number, discordName: string): Promise<any> {
+    return await supabase
+      .from('league_sign_ups')
+      .delete()
+      .eq('league_id', leagueId)
+      .eq('discord_name', discordName)
+  }
+
+  return {
+    signUpForLeague,
+    initalizeLeagues,
+    signOutFromLeague,
+    leagues
+  }
 })
