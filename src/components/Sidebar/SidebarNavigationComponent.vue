@@ -2,7 +2,11 @@
   <fwb-sidebar class="sidebar-option">
     <fwb-sidebar-logo logo="logo.png" name="Liga SFPL" tag="router-link" />
     <fwb-button v-if="!user" @click="handleLoginClicked" class="w-full">Zaloguj się</fwb-button>
-    <sidebar-item-component label="Strona główna" icon="la-book-open-solid" @click="goTo(routerPaths.home)" />
+    <sidebar-item-component
+      label="Strona główna"
+      icon="la-book-open-solid"
+      @click="goTo(routerPaths.home)"
+    />
     <sidebar-item-component
       label="Liga"
       icon="la-fist-raised-solid"
@@ -29,7 +33,11 @@
       @click="goTo(routerPaths.signUp)"
     />
 
-    <sidebar-login-indicator-component @logout-clicked="handleLogoutClicked" :user="user" v-if="user" />
+    <sidebar-login-indicator-component
+      @logout-clicked="handleLogoutClicked"
+      :user="user"
+      v-if="user"
+    />
   </fwb-sidebar>
 </template>
 <script setup lang="ts">
@@ -45,18 +53,18 @@ interface Props {
 }
 
 interface Emits {
-  (e: 'logout'): void,
+  (e: 'logout'): void
   (e: 'login'): void
 }
 
 defineProps<Props>()
 const emits = defineEmits<Emits>()
 
-function handleLoginClicked () {
+function handleLoginClicked() {
   emits('login')
 }
 
-function handleLogoutClicked () {
+function handleLogoutClicked() {
   emits('logout')
 }
 </script>
