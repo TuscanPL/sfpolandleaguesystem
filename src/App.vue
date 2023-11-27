@@ -5,12 +5,7 @@
       @login="handleLogin"
       @logout="handleLogout"
       :user="userStore.user"
-      :is-main-page-visible="configurationStore.isMainPageVisible"
-      :is-league-page-visible="configurationStore.isLeaguePageVisible"
-      :is-report-scores-page-visible="configurationStore.isReportScoresVisible"
-      :is-settings-page-visible="configurationStore.isSettingsVisible"
-      :is-upcoming-matches-page-visible="configurationStore.isUpcomingMatchVisible"
-      :is-sign-up-page-visible="configurationStore.isSignUpVisible"
+      :is-page-visible="configurationStore.isPageVisible"
     />
   </div>
   <div class="basis-auto w-full">

@@ -1,16 +1,16 @@
 import { defineStore } from 'pinia'
 import { supabase } from '@/common/supabase'
-import { ref } from 'vue'
 import { mapConfigurationOptionDbModelToConfigurationOption } from '@/common/mapper'
 
 export const useConfigurationStore = defineStore('configurationStore', () => {
-  const isMainPageVisible = ref(false)
-  const isLeaguePageVisible = ref(false)
-  const isUpcomingMatchVisible = ref(false)
-  const isSettingsVisible = ref(false)
-  const isReportScoresVisible = ref(false)
-  const isSignUpVisible = ref(false)
-
+  const isPageVisible: { [key: string]: boolean } = {
+    isMainPageVisible: false,
+    isLeaguePageVisible: false,
+    isUpcomingMatchesVisible: false,
+    isReportScoresVisible: false,
+    isSettingsVisible: false,
+    isSignUpVisible: false
+  }
   async function initializeConfigurationValues() {
     const { data } = await supabase.from('configuration').select()
 
@@ -19,34 +19,18 @@ export const useConfigurationStore = defineStore('configurationStore', () => {
     })
 
     for (const configurationOption of configurationOptions!) {
-      if (configurationOption.configurationKey === 'isMainPageVisible') {
-        isMainPageVisible.value = JSON.parse(configurationOption.configurationValue)
+      const key = configurationOption.configurationKey
+      const value = JSON.parse(configurationOption.configurationValue)
+
+      if (isPageVisible[key] !== undefined) {
+        isPageVisible[key] = value
       }
-      if (configurationOption.configurationKey === 'isLeaguePageVisible') {
-        isLeaguePageVisible.value = JSON.parse(configurationOption.configurationValue)
-      }
-      if (configurationOption.configurationKey === 'isUpcomingMatchesVisible') {
-        isUpcomingMatchVisible.value = JSON.parse(configurationOption.configurationValue)
-      }
-      if (configurationOption.configurationKey === 'isSettingsVisible') {
-        isSettingsVisible.value = JSON.parse(configurationOption.configurationValue)
-      }
-      if (configurationOption.configurationKey === 'isReportScoresVisible') {
-        isReportScoresVisible.value = JSON.parse(configurationOption.configurationValue)
-      }
-      if (configurationOption.configurationKey === 'isSignUpVisible') {
-        isSignUpVisible.value = JSON.parse(configurationOption.configurationValue)
-      }
+      console.log(isPageVisible[key])
     }
   }
 
   return {
-    isMainPageVisible,
-    isLeaguePageVisible,
-    isUpcomingMatchVisible,
-    isSettingsVisible,
-    isReportScoresVisible,
-    isSignUpVisible,
+    isPageVisible,
     initializeConfigurationValues
   }
 })

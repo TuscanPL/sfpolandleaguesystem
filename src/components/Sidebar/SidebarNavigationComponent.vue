@@ -3,37 +3,37 @@
     <fwb-sidebar-logo logo="logo.png" name="Liga SFPL" tag="router-link" />
     <fwb-button v-if="!user" @click="handleLoginClicked" class="w-full">Zaloguj się</fwb-button>
     <sidebar-item-component
-      v-if="isMainPageVisible"
+      v-if="isPageVisible"
       label="Strona główna"
       icon="la-book-open-solid"
       @click="goTo(routerPaths.home)"
     />
     <sidebar-item-component
-      v-if="isLeaguePageVisible"
+      v-if="isPageVisible"
       label="Liga"
       icon="la-fist-raised-solid"
       @click="goTo(routerPaths.leagueStandings)"
     />
     <sidebar-item-component
-      v-if="isUpcomingMatchesPageVisible"
+      v-if="isPageVisible"
       label="Nadchodzące mecze"
       icon="la-calendar-alt-solid"
       @click="goTo(routerPaths.upcomingMatches)"
     />
     <sidebar-item-component
-      v-if="isReportScoresPageVisible"
+      v-if="isPageVisible"
       label="Zaraportuj wynik"
       icon="la-clipboard-check-solid"
       @click="goTo(routerPaths.reportScores)"
     />
     <sidebar-item-component
-      v-if="isSettingsPageVisible"
+      v-if="isPageVisible"
       label="Ustawienia"
       icon="la-user-cog-solid"
       @click="goTo(routerPaths.userSettings)"
     />
     <sidebar-item-component
-      v-if="isSignUpPageVisible"
+      v-if="isPageVisible"
       label="Zapisz się"
       icon="la-file-signature-solid"
       @click="goTo(routerPaths.signUp)"
@@ -56,12 +56,7 @@ import type { User } from '@/models/app/userModel'
 
 interface Props {
   user?: User | null
-  isMainPageVisible: boolean
-  isLeaguePageVisible: boolean
-  isUpcomingMatchesPageVisible: boolean
-  isSettingsPageVisible: boolean
-  isReportScoresPageVisible: boolean
-  isSignUpPageVisible: boolean
+  isPageVisible: { [key: string]: boolean }
 }
 
 interface Emits {
