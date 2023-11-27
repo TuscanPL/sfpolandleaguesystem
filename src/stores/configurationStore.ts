@@ -1,16 +1,23 @@
 import { defineStore } from 'pinia'
 import { supabase } from '@/common/supabase'
 import { mapConfigurationOptionDbModelToConfigurationOption } from '@/common/mapper'
+import { reactive } from 'vue'
+
+interface ConfigurationState {
+  isPageVisible: { [key: string]: boolean }
+}
 
 export const useConfigurationStore = defineStore('configurationStore', () => {
-  const isPageVisible: { [key: string]: boolean } = {
-    isMainPageVisible: false,
-    isLeaguePageVisible: false,
-    isUpcomingMatchesVisible: false,
-    isReportScoresVisible: false,
-    isSettingsVisible: false,
-    isSignUpVisible: false
-  }
+  const state = reactive<ConfigurationState>({
+    isPageVisible: {
+      isMainPageVisible: false,
+      isLeaguePageVisible: false,
+      isUpcomingMatchesVisible: false,
+      isReportScoresVisible: false,
+      isSettingsVisible: false,
+      isSignUpVisible: false
+    }
+  })
   async function initializeConfigurationValues() {
     const { data } = await supabase.from('configuration').select()
 
@@ -22,15 +29,14 @@ export const useConfigurationStore = defineStore('configurationStore', () => {
       const key = configurationOption.configurationKey
       const value = JSON.parse(configurationOption.configurationValue)
 
-      if (isPageVisible[key] !== undefined) {
-        isPageVisible[key] = value
+      if (state.isPageVisible[key] !== undefined) {
+        state.isPageVisible[key] = value
       }
-      console.log(isPageVisible[key])
     }
   }
 
   return {
-    isPageVisible,
+    isPageVisible: state.isPageVisible,
     initializeConfigurationValues
   }
 })

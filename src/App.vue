@@ -5,7 +5,7 @@
       @login="handleLogin"
       @logout="handleLogout"
       :user="userStore.user"
-      :is-page-visible="configurationStore.isPageVisible"
+      :is-page-visible="isPageVisible"
     />
   </div>
   <div class="basis-auto w-full">
@@ -43,4 +43,8 @@ async function handleLogin() {
 async function handleLogout() {
   await userStore.signOut()
 }
+
+const isPageVisible = computed(() => {
+  return configurationStore.isPageVisible
+})
 </script>
