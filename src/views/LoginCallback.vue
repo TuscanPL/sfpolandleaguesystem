@@ -11,10 +11,10 @@ const userStore = useUserStore()
 const router = useRouter()
 
 onMounted(() => {
-  if (userStore.isCookiePresent) {
-    router.push(routerPaths.home)
-  } else {
+  if (!userStore.isCookiePresent) {
     window.location.reload()
   }
+
+  router.push(routerPaths.home)
 })
 </script>
