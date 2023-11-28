@@ -3,37 +3,37 @@
     <fwb-sidebar-logo logo="logo.png" name="Liga SFPL" tag="router-link" />
     <fwb-button v-if="!user" @click="handleLoginClicked" class="w-full">Zaloguj się</fwb-button>
     <sidebar-item-component
-      v-if="isPageVisible['isMainPageVisible']"
+      v-if="featureFlagConfigurationState.isMainPageVisible"
       label="Strona główna"
       icon="la-book-open-solid"
       @click="goTo(routerPaths.home)"
     />
     <sidebar-item-component
-      v-if="isPageVisible['isLeaguePageVisible']"
+      v-if="featureFlagConfigurationState.isLeaguePageVisible"
       label="Liga"
       icon="la-fist-raised-solid"
       @click="goTo(routerPaths.leagueStandings)"
     />
     <sidebar-item-component
-      v-if="isPageVisible['isUpcomingMatchesVisible']"
+      v-if="featureFlagConfigurationState.isUpcomingMatchesVisible"
       label="Nadchodzące mecze"
       icon="la-calendar-alt-solid"
       @click="goTo(routerPaths.upcomingMatches)"
     />
     <sidebar-item-component
-      v-if="isPageVisible['isReportScoresVisible']"
+      v-if="featureFlagConfigurationState.isReportScoresVisible"
       label="Zaraportuj wynik"
       icon="la-clipboard-check-solid"
       @click="goTo(routerPaths.reportScores)"
     />
     <sidebar-item-component
-      v-if="isPageVisible['isSettingsVisible']"
+      v-if="featureFlagConfigurationState.isSettingsVisible"
       label="Ustawienia"
       icon="la-user-cog-solid"
       @click="goTo(routerPaths.userSettings)"
     />
     <sidebar-item-component
-      v-if="isPageVisible['isSignUpVisible']"
+      v-if="featureFlagConfigurationState.isSignUpVisible"
       label="Zapisz się"
       icon="la-file-signature-solid"
       @click="goTo(routerPaths.signUp)"
@@ -53,10 +53,11 @@ import SidebarLoginIndicatorComponent from '@/components/Sidebar/SidebarLoginInd
 import { routerPaths } from '@/router/routes'
 import { goTo } from '@/common/routeHelper'
 import type { User } from '@/models/app/userModel'
+import type { ConfigurationState } from '@/models/app/configurationStateModel'
 
 interface Props {
   user?: User | null
-  isPageVisible: { [key: string]: boolean }
+  featureFlagConfigurationState: ConfigurationState
 }
 
 interface Emits {

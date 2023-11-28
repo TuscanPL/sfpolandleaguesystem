@@ -1,22 +1,17 @@
 import { defineStore } from 'pinia'
 import { supabase } from '@/common/supabase'
 import { mapConfigurationOptionDbModelToConfigurationOption } from '@/common/mapper'
-import { reactive } from 'vue'
-
-interface ConfigurationState {
-  isPageVisible: { [key: string]: boolean }
-}
+import { ref } from 'vue'
+import type { ConfigurationState } from '@/models/app/configurationStateModel'
 
 export const useConfigurationStore = defineStore('configurationStore', () => {
-  const state = reactive<ConfigurationState>({
-    isPageVisible: {
-      isMainPageVisible: false,
-      isLeaguePageVisible: false,
-      isUpcomingMatchesVisible: false,
-      isReportScoresVisible: false,
-      isSettingsVisible: false,
-      isSignUpVisible: false
-    }
+  const featureFlagStates = ref<ConfigurationState>({
+    isMainPageVisible: ref(false),
+    isLeaguePageVisible: ref(false),
+    isUpcomingMatchesVisible: ref(false),
+    isReportScoresVisible: ref(false),
+    isSettingsVisible: ref(false),
+    isSignUpVisible: ref(false)
   })
   async function initializeConfigurationValues() {
     const { data } = await supabase.from('configuration').select()
@@ -25,18 +20,19 @@ export const useConfigurationStore = defineStore('configurationStore', () => {
       return mapConfigurationOptionDbModelToConfigurationOption(configurationOption)
     })
 
-    for (const configurationOption of configurationOptions!) {
-      const key = configurationOption.configurationKey
-      const value = JSON.parse(configurationOption.configurationValue)
+    if (!configurationOptions) {
+      return
+    }
 
-      if (state.isPageVisible[key] !== undefined) {
-        state.isPageVisible[key] = value
-      }
+    for (const configurationOption of configurationOptions) {
+      featureFlagStates.value[configurationOption.configurationKey] = JSON.parse(
+        configurationOption.configurationValue
+      )
     }
   }
 
   return {
-    isPageVisible: state.isPageVisible,
+    featureFlagStates,
     initializeConfigurationValues
   }
 })
