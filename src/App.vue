@@ -5,6 +5,7 @@
       @login="handleLogin"
       @logout="handleLogout"
       :user="userStore.user"
+      :is-cookie-present="userStore.isCookiePresent"
       :feature-flag-configuration-state="configurationStore.featureFlagStates"
     />
   </div>
@@ -15,21 +16,12 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
 import SidebarNavigationComponent from '@/components/Sidebar/SidebarNavigationComponent.vue'
-import { computed, onMounted, watch } from 'vue'
+import { onMounted } from 'vue'
 import { useUserStore } from '@/stores/userStore'
 import { useConfigurationStore } from '@/stores/configurationStore'
-import { getUserCookie } from '@/common/cookieHelper'
 
 const userStore = useUserStore()
 const configurationStore = useConfigurationStore()
-
-const isCookiePresent = computed(() => {
-  return getUserCookie() !== null
-})
-
-watch(isCookiePresent, () => {
-  userStore.initalizeUser()
-})
 
 onMounted(() => {
   userStore.initalizeUser()

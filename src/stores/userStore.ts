@@ -4,6 +4,7 @@ import { computed, ref } from 'vue'
 import { getMappedUserCookie, getUserCookie } from '@/common/cookieHelper'
 import { mapUserCookieToUser } from '@/common/mapper'
 import type { User } from '@/models/app/userModel'
+import { routerPaths } from '@/router/routes'
 
 export const useUserStore = defineStore('userStore', () => {
   const user = ref<User | null>(null)
@@ -28,7 +29,10 @@ export const useUserStore = defineStore('userStore', () => {
 
   async function signInWithDiscord() {
     await supabase.auth.signInWithOAuth({
-      provider: 'discord'
+      provider: 'discord',
+      options: {
+        redirectTo: `http://localhost:5173${routerPaths.loginCallback}`
+      }
     })
 
     initalizeUser()

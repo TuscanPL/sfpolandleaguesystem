@@ -40,7 +40,7 @@ async function handleLeagueSignUp(leagueId: number) {
 async function handleLeagueSignOut(leagueId: number) {
   if (!userStore.user) return
 
-  await leagueStore.signOutFromLeague(leagueId, userStore.user.globalName)
+  await leagueStore.signOutFromLeague(leagueId)
   initializeLeagues()
 }
 
