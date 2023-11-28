@@ -33,12 +33,8 @@ export const useLeaguesStore = defineStore('leaguesStore', () => {
     })
   }
 
-  async function signOutFromLeague(leagueId: number, discordName: string): Promise<any> {
-    return await supabase
-      .from('league_sign_ups')
-      .delete()
-      .eq('league_id', leagueId)
-      .eq('discord_name', discordName)
+  async function signOutFromLeague(leagueId: number): Promise<any> {
+    return await supabase.from('league_sign_ups').delete().eq('league_id', leagueId)
   }
 
   return {

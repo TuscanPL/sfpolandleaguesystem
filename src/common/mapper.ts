@@ -38,6 +38,7 @@ function mapLeagueDbModelToLeague(league: any): League {
       avatarUrl: user.avatar_url,
       createdAt: new Date(user.created_at),
       discordName: user.discord_name,
+      discordUserId: user.user_id,
       id: user.id
     } as LeagueAssignedUser
   }

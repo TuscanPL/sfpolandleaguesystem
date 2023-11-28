@@ -22,30 +22,36 @@
         </template>
         {{ signedUpUsersAmount }}
       </fwb-badge>
-      <fwb-badge
-        v-if="!isUserSignedUp"
-        type="green"
-        class="rounded-full p-1 text-sm w-1/5 ml-auto hover:bg-green-200 hover:shadow-md hover:cursor-pointer transition"
-        @click="handleLeagueSignUpCallback"
-      >
-        <template #icon>
-          <v-icon class="mr-2" name="la-fist-raised-solid" />
-        </template>
-        Zapisz się!
-      </fwb-badge>
-      <fwb-badge
-        v-else
-        type="red"
-        class="rounded-full p-1 text-sm w-1/5 ml-auto hover:bg-red-200 hover:shadow-md hover:cursor-pointer transition"
-        @click="handleLeagueSignOutCallback"
-      >
-        <template #icon>
-          <v-icon class="mr-2" name="la-minus-circle-solid" />
-        </template>
-        Wypisz się
-      </fwb-badge>
+      <div v-if="isUserLoggedIn" class="w-1/5 ml-auto">
+        <fwb-badge
+          v-if="!isUserSignedUp"
+          type="green"
+          class="rounded-full p-1 text-sm w-full hover:bg-green-200 hover:shadow-md hover:cursor-pointer transition"
+          @click="handleLeagueSignUpCallback"
+        >
+          <template #icon>
+            <v-icon class="mr-2" name="la-fist-raised-solid" />
+          </template>
+          Zapisz się!
+        </fwb-badge>
+        <fwb-badge
+          v-else
+          type="red"
+          class="rounded-full p-1 text-sm w-full hover:bg-red-200 hover:shadow-md hover:cursor-pointer transition"
+          @click="handleLeagueSignOutCallback"
+        >
+          <template #icon>
+            <v-icon class="mr-2" name="la-minus-circle-solid" />
+          </template>
+          Wypisz się
+        </fwb-badge>
+      </div>
     </div>
-    <signed-up-table-component :signed-up-users="league.leagueSignUps" class="mt-3" />
+    <signed-up-table-component
+      v-if="league.leagueSignUps.length"
+      :signed-up-users="league.leagueSignUps"
+      class="mt-3"
+    />
   </div>
 </template>
 <script setup lang="ts">
@@ -76,7 +82,11 @@ const signedUpUsersAmount = computed(() => {
 })
 
 const isUserSignedUp = computed(() => {
-  return props.league.leagueSignUps.filter((c) => c.discordName === props.user.globalName).length
+  return props.league.leagueSignUps.filter((c) => c.discordUserId === props.user.userId).length
+})
+
+const isUserLoggedIn = computed(() => {
+  return Object.keys(props.user).length > 0
 })
 
 function handleLeagueSignUpCallback() {

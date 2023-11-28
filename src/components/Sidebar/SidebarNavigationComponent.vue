@@ -57,6 +57,7 @@ import type { ConfigurationState } from '@/models/app/configurationStateModel'
 
 interface Props {
   user?: User | null
+  isCookiePresent: boolean
   featureFlagConfigurationState: ConfigurationState
 }
 
