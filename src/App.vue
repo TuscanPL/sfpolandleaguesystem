@@ -3,7 +3,7 @@
     <div class="left-0 top-0 absolute z-20 w-full">
       <div
         :class="drawerClass"
-        class="absolute top-0 h-screen bg-white transform drop-shadow-md w-full"
+        class="absolute top-0 bg-white transform w-full"
         tabindex="-1"
         aria-labelledby="drawer-label"
       >
@@ -20,8 +20,8 @@
       </div>
     </div>
     <div>
-      <router-view class="mb-20" />
-      <fwb-footer class="fixed bottom-0 w-full border-t rounded-none">
+      <router-view />
+      <fwb-footer class="absolute bottom-0 w-full border-t rounded-none">
         <v-icon name="la-bars-solid" id="toggleButton" @click="toggleDrawer" />
       </fwb-footer>
     </div>

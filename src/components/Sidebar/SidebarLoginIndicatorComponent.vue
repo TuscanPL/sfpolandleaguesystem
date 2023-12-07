@@ -1,6 +1,10 @@
 <template>
-  <div class="flex flex-row fixed items-center bottom-0 left-0 p-2 xl:w-64 w-full">
-    <fwb-card @click.stop="handleToggleButton" @class.prevent class="z-50 w-full cursor-pointer">
+  <div class="flex flex-row fixed items-center bottom-0 left-0 p-2 w-full xl:w-64">
+    <fwb-card
+      @click.stop="handleToggleButton"
+      @class.prevent
+      class="z-50 min-w-full cursor-pointer"
+    >
       <div class="flex items-center p-2">
         <fwb-avatar bordered :img="user?.avatarUrl" rounded />
         <p class="font-medium text-gray-700 dark:text-gray-400 ml-4">
