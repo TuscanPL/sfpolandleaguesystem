@@ -1,6 +1,6 @@
 <template>
   <div class="w-full" v-if="isMobileView">
-    <div class="left-0 top-0 absolute z-20 w-full">
+    <div class="left-0 top-0 fixed z-20 w-full">
       <div
         :class="drawerClass"
         class="absolute top-0 bg-white transform w-full"
