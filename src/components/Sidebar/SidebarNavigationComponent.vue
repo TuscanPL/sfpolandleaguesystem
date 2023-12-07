@@ -38,10 +38,10 @@
       icon="la-file-signature-solid"
       @click="goTo(routerPaths.signUp)"
     />
-
     <sidebar-login-indicator-component
       @logout-clicked="handleLogoutClicked"
       :user="user"
+      :logout-popout-direction="isMobileView ? 'up' : 'right'"
       v-if="user"
     />
   </fwb-sidebar>
@@ -59,6 +59,7 @@ interface Props {
   user?: User | null
   isCookiePresent: boolean
   featureFlagConfigurationState: ConfigurationState
+  isMobileView: boolean
 }
 
 interface Emits {

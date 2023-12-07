@@ -1,28 +1,30 @@
 <template>
-  <div class="w-4/5 m-4 p-3 rounded-2xl relative border shadow-md transition max-h-screen">
-    <div class="row mt-2">
+  <div
+    class="w-full xl:w-4/5 xl:mx-auto xl:mt-4 p-3 xl:rounded-2xl relative xl:border xl:shadow-md transition max-h-screen"
+  >
+    <div class="row mt-2 text-center xl:text-left">
       <span class="text-2xl font-medium">{{ league.leagueName }}</span>
     </div>
-    <div class="row flex mt-10 w-full">
-      <fwb-badge type="dark" class="rounded-full p-1 text-sm w-1/5">
+    <div class="row xl:flex mt-5 xl:mt-10 w-full">
+      <fwb-badge type="dark" class="rounded-full p-1 text-sm w-full xl:w-1/5">
         <template #icon>
           <v-icon class="mr-2" name="la-clock-solid" />
         </template>
         {{ league.leagueStartDate.toDateString() }}
       </fwb-badge>
-      <fwb-badge type="dark" class="rounded-full p-1 text-sm w-1/5">
+      <fwb-badge type="dark" class="rounded-full p-1 text-sm mt-2 xl:mt-0 w-full xl:w-1/5">
         <template #icon>
           <v-icon class="mr-2" name="la-calendar-times" />
         </template>
         {{ league.leagueEndDate.toDateString() }}
       </fwb-badge>
-      <fwb-badge type="dark" class="rounded-full p-1 text-sm w-1/5">
+      <fwb-badge type="dark" class="rounded-full p-1 text-sm mt-2 xl:mt-0 w-full xl:w-1/5">
         <template #icon>
           <v-icon class="mr-2" name="la-user-solid" />
         </template>
         {{ signedUpUsersAmount }}
       </fwb-badge>
-      <div v-if="isUserLoggedIn" class="w-1/5 ml-auto">
+      <div v-if="isUserLoggedIn" class="xl:w-1/5 mt-2 xl:mt-0 xl:ml-auto">
         <fwb-badge
           v-if="!isUserSignedUp"
           type="green"
