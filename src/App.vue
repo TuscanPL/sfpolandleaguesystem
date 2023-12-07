@@ -21,7 +21,7 @@
     </div>
     <div>
       <router-view />
-      <fwb-footer class="absolute bottom-0 w-full border-t rounded-none">
+      <fwb-footer class="footer mt-3">
         <v-icon name="la-bars-solid" id="toggleButton" @click="toggleDrawer" />
       </fwb-footer>
     </div>
