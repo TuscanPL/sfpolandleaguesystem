@@ -20,7 +20,7 @@
       </div>
     </div>
     <router-view />
-    <fwb-footer class="sticky bottom-0">
+    <fwb-footer class="fixed bottom-0 w-full">
       <v-icon name="la-bars-solid" id="toggleButton" @click="toggleDrawer" />
     </fwb-footer>
   </div>
