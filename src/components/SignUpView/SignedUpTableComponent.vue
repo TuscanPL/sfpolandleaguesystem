@@ -9,7 +9,9 @@
         <fwb-table-cell style="text-align: left">
           <div class="row inline-flex justify-start items-center">
             <fwb-avatar rounded :img="user.avatarUrl" />
-            <span class="ml-3">{{ user.discordName }}</span>
+            <span class="ml-3 overflow-hidden overflow-ellipsis whitespace-nowrap">{{
+              user.discordName
+            }}</span>
           </div>
         </fwb-table-cell>
         <fwb-table-cell>
