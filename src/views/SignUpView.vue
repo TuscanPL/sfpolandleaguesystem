@@ -3,7 +3,6 @@
     <league-tile-component
       v-for="league in leagueStore.leagues"
       :key="league.id"
-      class="mx-auto"
       :league="league"
       :user="user"
       @league-sign-up-clicked="handleLeagueSignUp(league.id)"

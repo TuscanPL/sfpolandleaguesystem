@@ -1,8 +1,5 @@
 <template>
-  <div v-if="isMobileView">
-    <fwb-button class="fixed right-0 m-2 z-40" square color="dark" @click="toggleDrawer">
-      <v-icon name="la-bars-solid" id="toggleButton" class="w-7 h-7" />
-    </fwb-button>
+  <div class="w-full" v-if="isMobileView">
     <div class="left-0 top-0 absolute z-20 w-full">
       <div
         :class="drawerClass"
@@ -11,7 +8,7 @@
         aria-labelledby="drawer-label"
       >
         <sidebar-navigation-component
-          class="relative left-0 drawer-content w-full"
+          class="relative left-0 w-full"
           @login="handleLogin"
           @logout="handleLogout"
           :user="userStore.user"
@@ -22,8 +19,11 @@
         />
       </div>
     </div>
-    <div :class="routerViewClass" @click="hideDrawer">
-      <router-view />
+    <div>
+      <router-view class="mb-20" />
+      <fwb-footer class="fixed bottom-0 w-full border-t rounded-none">
+        <v-icon name="la-bars-solid" id="toggleButton" @click="toggleDrawer" />
+      </fwb-footer>
     </div>
   </div>
   <div class="flex w-full" v-else>
@@ -50,7 +50,7 @@ import SidebarNavigationComponent from '@/components/Sidebar/SidebarNavigationCo
 import { onMounted, ref, computed } from 'vue'
 import { useUserStore } from '@/stores/userStore'
 import { useConfigurationStore } from '@/stores/configurationStore'
-import { FwbButton } from 'flowbite-vue'
+import { FwbFooter } from 'flowbite-vue'
 import { useEventListener } from '@vueuse/core'
 
 const userStore = useUserStore()
@@ -68,13 +68,6 @@ const drawerClass = computed(() => {
     'transition-transform ease-in-out duration-300': true,
     'translate-x-0': isDrawerOpen.value,
     '-translate-x-full': !isDrawerOpen.value
-  }
-})
-
-const routerViewClass = computed(() => {
-  return {
-    'basis-auto': !isMobileView.value,
-    'w-full': true
   }
 })
 

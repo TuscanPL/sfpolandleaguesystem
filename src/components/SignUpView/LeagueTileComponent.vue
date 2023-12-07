@@ -1,11 +1,11 @@
 <template>
   <div
-    class="w-full xl:w-4/5 xl:m-4 p-3 xl:rounded-2xl relative xl:border xl:shadow-md transition max-h-screen"
+    class="w-full xl:w-4/5 xl:mx-auto xl:mt-4 p-3 xl:rounded-2xl relative xl:border xl:shadow-md transition max-h-screen"
   >
-    <div class="row mt-2">
+    <div class="row mt-2 text-center xl:text-left">
       <span class="text-2xl font-medium">{{ league.leagueName }}</span>
     </div>
-    <div class="row xl:flex mt-10 w-full">
+    <div class="row xl:flex mt-5 xl:mt-10 w-full">
       <fwb-badge type="dark" class="rounded-full p-1 text-sm w-full xl:w-1/5">
         <template #icon>
           <v-icon class="mr-2" name="la-clock-solid" />

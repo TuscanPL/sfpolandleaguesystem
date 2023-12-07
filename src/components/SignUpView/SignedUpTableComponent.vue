@@ -1,5 +1,5 @@
 <template>
-  <fwb-table class="drop-shadow-lg">
+  <fwb-table class="drop-shadow-lg rounded-md">
     <fwb-table-head>
       <fwb-table-head-cell>Nick</fwb-table-head-cell>
       <fwb-table-head-cell style="text-align: right">Zapisany</fwb-table-head-cell>
@@ -8,10 +8,10 @@
       <fwb-table-row v-for="user in signedUpUsers" :key="user.id">
         <fwb-table-cell style="text-align: left">
           <div class="row inline-flex justify-start items-center">
-            <fwb-avatar rounded :img="user.avatarUrl" />
-            <span class="ml-3 overflow-hidden overflow-ellipsis whitespace-nowrap">{{
-              user.discordName
-            }}</span>
+            <fwb-avatar class="flex-shrink-0" rounded :img="user.avatarUrl" />
+            <span class="ml-3 overflow-hidden overflow-ellipsis">
+              {{ user.discordName }}
+            </span>
           </div>
         </fwb-table-cell>
         <fwb-table-cell>
