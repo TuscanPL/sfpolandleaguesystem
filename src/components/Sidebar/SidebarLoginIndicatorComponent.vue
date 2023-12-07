@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-row fixed items-center bottom-0 left-0 p-2 w-full xl:w-64">
+  <div class="flex flex-row fixed items-center bottom-20 left-0 p-2 w-full xl:bottom-0 xl:w-64">
     <fwb-card
       @click.stop="handleToggleButton"
       @class.prevent
