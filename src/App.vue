@@ -19,12 +19,10 @@
         />
       </div>
     </div>
-    <div>
-      <router-view />
-      <fwb-footer class="footer mt-3">
-        <v-icon name="la-bars-solid" id="toggleButton" @click="toggleDrawer" />
-      </fwb-footer>
-    </div>
+    <router-view />
+    <fwb-footer class="sticky bottom-0">
+      <v-icon name="la-bars-solid" id="toggleButton" @click="toggleDrawer" />
+    </fwb-footer>
   </div>
   <div class="flex w-full" v-else>
     <div class="basis-16 left-0 w-64">
