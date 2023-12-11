@@ -5,6 +5,7 @@ const upcomingMatches = () => import('@/views/UpcomingMatchesView.vue')
 const userSettings = () => import('@/views/UserSettingsView.vue')
 const signUp = () => import('@/views/SignUpView.vue')
 const loginCallback = () => import('@/views/LoginCallback.vue')
+const adminPanel = () => import('@/views/AdminPanelView.vue')
 
 const routerPaths = {
   home: '/:reload?',
@@ -13,7 +14,8 @@ const routerPaths = {
   upcomingMatches: '/upcoming-matches',
   userSettings: '/user-settings',
   signUp: '/sign-up',
-  loginCallback: '/login-callback'
+  loginCallback: '/login-callback',
+  adminPanel: '/admin-panel'
 }
 
 const routes = [
@@ -56,6 +58,11 @@ const routes = [
     path: routerPaths.loginCallback,
     name: 'loginCallback',
     component: loginCallback
+  },
+  {
+    path: routerPaths.adminPanel,
+    name: 'adminPanel',
+    component: adminPanel
   }
 ]
 

@@ -8,12 +8,13 @@ import { envConfig } from '@/common/envVariables'
 
 export const useUserStore = defineStore('userStore', () => {
   const user = ref<User | null>(null)
+  const isAdmin = ref(false)
 
   const isCookiePresent = computed(() => {
     return getUserCookie() !== null
   })
 
-  function initalizeUser() {
+  async function initalizeUser(): Promise<void> {
     if (getUserCookie() == null) return setUserNull()
 
     const data = getMappedUserCookie()
@@ -21,10 +22,25 @@ export const useUserStore = defineStore('userStore', () => {
 
     user.value = mapUserCookieToUser(data)
 
+    return Promise.resolve()
+
     function setUserNull() {
       user.value = null
+      return Promise.reject()
+    }
+  }
+
+  async function setAdminStatus(): Promise<void> {
+    const { data, error } = await supabase.from('league_admins').select()
+
+    if (error) {
+      console.error(error)
+      isAdmin.value = false
       return
     }
+
+    isAdmin.value = data.length > 0
+    return
   }
 
   async function signInWithDiscord() {
@@ -46,6 +62,8 @@ export const useUserStore = defineStore('userStore', () => {
   return {
     signInWithDiscord,
     signOut,
+    setAdminStatus,
+    isAdmin,
     user,
     initalizeUser,
     isCookiePresent

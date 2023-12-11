@@ -13,6 +13,7 @@ export const useConfigurationStore = defineStore('configurationStore', () => {
     isSettingsVisible: ref(false),
     isSignUpVisible: ref(false)
   })
+
   async function initializeConfigurationValues() {
     const { data } = await supabase.from('configuration').select()
 

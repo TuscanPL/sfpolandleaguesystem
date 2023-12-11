@@ -69,11 +69,12 @@ const drawerClass = computed(() => {
   }
 })
 
-onMounted(() => {
+onMounted(async () => {
   addEventListeners()
 
-  userStore.initalizeUser()
-  configurationStore.initializeConfigurationValues()
+  await configurationStore.initializeConfigurationValues()
+  await userStore.initalizeUser()
+  await userStore.setAdminStatus()
 })
 
 async function handleLogin() {
