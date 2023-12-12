@@ -1,7 +1,7 @@
 <template>
   <div class="absolute flex flex-col justify-center items-center h-screen w-full">
     <fwb-spinner size="10" color="red" />
-    <div class="text-lg mt-2">Getting User Data</div>
+    <div class="text-lg mt-2">Pobieram dane gracza</div>
   </div>
 </template>
 <script setup lang="ts">
