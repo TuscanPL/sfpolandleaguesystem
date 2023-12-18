@@ -9,10 +9,11 @@
     "build-only": "vite build",
     "type-check": "vue-tsc --noEmit -p tsconfig.app.json --composite false",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
-    "format": "prettier --write src/"
+    "format": "prettier --write src/",
+    "generate-local-types": "pnpx supabase gen types typescript --local --schema public > src/models/types/supabase.ts"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.38.4",
+    "@supabase/supabase-js": "^2.39.0",
     "@vueuse/core": "^10.7.0",
     "dotenv": "^16.3.1",
     "flowbite": "^2.1.1",

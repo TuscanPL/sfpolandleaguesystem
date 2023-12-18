@@ -43,7 +43,7 @@ export const useUserStore = defineStore('userStore', () => {
     return
   }
 
-  async function signInWithDiscord() {
+  async function signInWithDiscord(): Promise<void> {
     await supabase.auth.signInWithOAuth({
       provider: 'discord',
       options: {
@@ -54,7 +54,7 @@ export const useUserStore = defineStore('userStore', () => {
     initalizeUser()
   }
 
-  async function signOut() {
+  async function signOut(): Promise<void> {
     await supabase.auth.signOut()
     user.value = null
   }

@@ -1,5 +1,4 @@
 import type { ConfigurationOption } from '@/models/api/configurationOptionModel'
-import type { League, LeagueAssignedUser } from '@/models/app/leagueModel'
 import type { UserCookie } from '@/models/app/userCookieModel'
 import type { User } from '@/models/app/userModel'
 
@@ -23,29 +22,4 @@ function mapConfigurationOptionDbModelToConfigurationOption(
   } as ConfigurationOption
 }
 
-function mapLeagueDbModelToLeague(league: any): League {
-  return {
-    id: league.id,
-    createdAt: new Date(league.created_at),
-    leagueName: league.league_name,
-    leagueStartDate: new Date(league.league_start_date),
-    leagueEndDate: new Date(league.league_end_date),
-    leagueSignUps: league.league_sign_ups.map((user: any) => mapLeagueUserDbModelToLeagueUser(user))
-  } as League
-
-  function mapLeagueUserDbModelToLeagueUser(user: any): LeagueAssignedUser {
-    return {
-      avatarUrl: user.avatar_url,
-      createdAt: new Date(user.created_at),
-      discordName: user.discord_name,
-      discordUserId: user.user_id,
-      id: user.id
-    } as LeagueAssignedUser
-  }
-}
-
-export {
-  mapUserCookieToUser,
-  mapLeagueDbModelToLeague,
-  mapConfigurationOptionDbModelToConfigurationOption
-}
+export { mapUserCookieToUser, mapConfigurationOptionDbModelToConfigurationOption }
