@@ -1,5 +1,6 @@
 import { supabase } from '@/common/supabase'
 import type { League } from '@/models/app/leagueModel'
+import type { Tables, TablesInsert } from '@/models/types/supabase'
 import type { QueryData } from '@supabase/supabase-js'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
@@ -7,7 +8,7 @@ import { ref } from 'vue'
 export const useLeaguesStore = defineStore('leaguesStore', () => {
   const leagues = ref<League[]>([])
 
-  async function initalizeLeagues(): Promise<void> {
+  async function getLeagues(): Promise<void> {
     const leaguesWithUsersQuery = supabase.from('leagues').select(`
                 *,
                 league_sign_ups (
@@ -82,10 +83,63 @@ export const useLeaguesStore = defineStore('leaguesStore', () => {
     return data
   }
 
+  async function createLeague(
+    leagueName: string,
+    leagueStartDate: Date,
+    leagueEndDate: Date
+  ): Promise<null> {
+    const { data, error } = await supabase.from('leagues').insert({
+      league_name: leagueName,
+      league_start_date: leagueStartDate.toDateString(),
+      league_end_date: leagueEndDate.toDateString()
+    } as TablesInsert<'leagues'>)
+
+    if (error) {
+      return Promise.reject(error)
+    }
+
+    return data
+  }
+
+  async function updateLeague(
+    leagueId: number,
+    leagueName: string,
+    leagueStartDate: Date,
+    leagueEndDate: Date
+  ): Promise<null> {
+    const { data, error } = await supabase
+      .from('leagues')
+      .update({
+        league_name: leagueName,
+        league_start_date: leagueStartDate.toDateString(),
+        league_end_date: leagueEndDate.toDateString()
+      } as TablesInsert<'leagues'>)
+      .eq('id', leagueId)
+
+    if (error) {
+      return Promise.reject(error)
+    }
+
+    return data
+  }
+
+  async function deleteLeague(leagueId: number): Promise<null> {
+    const { data, error } = await supabase.from('leagues').delete().eq('id', leagueId)
+
+    if (error) {
+      return Promise.reject(error)
+    }
+
+    return data
+  }
+
   return {
     signUpForLeague,
-    initalizeLeagues,
+    getLeagues,
     signOutFromLeague,
-    leagues
+    leagues,
+    createLeague,
+    updateLeague,
+    deleteLeague
   }
 })

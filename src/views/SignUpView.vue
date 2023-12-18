@@ -44,6 +44,6 @@ async function handleLeagueSignOut(leagueId: number) {
 }
 
 function initializeLeagues() {
-  leagueStore.initalizeLeagues()
+  leagueStore.getLeagues()
 }
 </script>
