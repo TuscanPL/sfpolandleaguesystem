@@ -18,8 +18,19 @@
         <fwb-table-cell>
           <fwb-button
             class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition"
+            @click="handleOpenLeagueModal(league)"
           >
             Edytuj
+          </fwb-button>
+        </fwb-table-cell>
+      </fwb-table-row>
+      <fwb-table-row>
+        <fwb-table-cell colspan="5">
+          <fwb-button
+            class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition"
+            @click="handleOpenLeagueModal()"
+          >
+            Dodaj nową ligę
           </fwb-button>
         </fwb-table-cell>
       </fwb-table-row>
@@ -43,5 +54,15 @@ interface Props {
   leagues: League[]
 }
 
+interface Emits {
+  (event: 'onOpenLeagueModal', league?: League): void
+}
+
 defineProps<Props>()
+
+const emits = defineEmits<Emits>()
+
+function handleOpenLeagueModal(league?: League) {
+  emits('onOpenLeagueModal', league)
+}
 </script>

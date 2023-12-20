@@ -83,6 +83,20 @@ export const useLeaguesStore = defineStore('leaguesStore', () => {
     return data
   }
 
+  async function removeFromLeague(leagueId: number, discordUserId: string): Promise<null> {
+    const { data, error } = await supabase
+      .from('league_sign_ups')
+      .delete()
+      .eq('league_id', leagueId)
+      .eq('user_id', discordUserId)
+
+    if (error) {
+      return Promise.reject(error)
+    }
+
+    return data
+  }
+
   async function createLeague(
     leagueName: string,
     leagueStartDate: Date,
@@ -140,6 +154,7 @@ export const useLeaguesStore = defineStore('leaguesStore', () => {
     leagues,
     createLeague,
     updateLeague,
-    deleteLeague
+    deleteLeague,
+    removeFromLeague
   }
 })
