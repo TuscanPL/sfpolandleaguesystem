@@ -3,7 +3,7 @@ import type { League } from '@/models/app/leagueModel'
 import type { TablesInsert } from '@/models/types/supabase'
 import { RealtimeChannel, type QueryData, type RealtimePostgresChangesPayload } from '@supabase/supabase-js'
 import { defineStore } from 'pinia'
-import { ref, triggerRef } from 'vue'
+import { ref } from 'vue'
 
 export const useLeaguesStore = defineStore('leaguesStore', () => {
   const leagues = ref<League[]>([])

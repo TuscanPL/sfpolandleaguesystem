@@ -7,7 +7,7 @@
       <fwb-input label="Nazwa ligi" v-model="leagueName" class="mb-2" />
       <vue-date-picker placeholder="Data początku ligi" v-model="leagueStartDate" class="mb-2" />
       <vue-date-picker placeholder="Data końca ligi" v-model="leagueEndDate" class="mb-2" />
-      <fwb-table v-if="isEditMode">
+      <fwb-table v-if="isEditMode && league?.leagueSignUps.length">
         <fwb-table-head>
           <fwb-table-head-cell>Użytkownik</fwb-table-head-cell>
           <fwb-table-head-cell>
@@ -40,7 +40,7 @@
         <fwb-button
           v-if="isEditMode"
           class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition"
-          @click="removeLeague(props.league?.id)"
+          @click="emits('onOpenConfirmationModal')"
         >
           Usuń ligę
         </fwb-button>
@@ -76,8 +76,8 @@ interface Emits {
   (event: 'onAdd', league: LeagueStub): void
   (event: 'onEdit', league: LeagueStub): void
   (event: 'onRemoveUserFromLeague', userId: string, leagueId: number): void
-  (event: 'onRemoveLeague', leagueId: number): void
   (event: 'close'): void
+  (event: 'onOpenConfirmationModal'): void
 }
 
 const props = defineProps<Props>()
@@ -123,14 +123,6 @@ function removeUserFromLeague(userId: string, leagueId?: number) {
   }
 
   emits('onRemoveUserFromLeague', userId, leagueId)
-}
-
-function removeLeague(leagueId?: number) {
-  if (!leagueId) {
-    return // todo: handle error
-  }
-
-  emits('onRemoveLeague', leagueId)
 }
 
 function resetAndCloseModal() {

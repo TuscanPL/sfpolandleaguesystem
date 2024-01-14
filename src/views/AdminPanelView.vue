@@ -10,9 +10,16 @@
       @onAdd="handleAddLeague"
       @onEdit="handleEditLeague"
       @onRemoveUserFromLeague="handleRemoveUserFromLeague"
-      @onRemoveLeague="handleRemoveLeague"
       @close="isCreateOrEditLeagueModalOpen = false"
+      @on-open-confirmation-modal="handleOnOpenConfirmationModal"
     />
+    <RemoveLeagueConfirmationModalComponent
+      :leagueName="leagueToEdit?.leagueName ?? ''"
+      :leagueId="leagueToEdit?.id ?? 0"
+      :isOpen="isRemoveLeagueConfirmationModalOpen"
+      @onRemoveLeague="handleRemoveLeague"
+      @close="isRemoveLeagueConfirmationModalOpen = false"
+      />
   </div>
 </template>
 <script setup lang="ts">
@@ -25,12 +32,14 @@ import LeagueManagementTableComponent from '@/components/AdminPanelView/LeagueMa
 import CreateOrEditLeagueModalComponent from '@/components/AdminPanelView/CreateOrEditLeagueModalComponent.vue'
 import type { LeagueStub } from '@/models/app/leagueStubModel'
 import type { League } from '@/models/app/leagueModel'
+import RemoveLeagueConfirmationModalComponent from '@/components/AdminPanelView/RemoveLeagueConfirmationModalComponent.vue'
 
 const userStore = useUserStore()
 const leagueStore = useLeaguesStore()
 const router = useRouter()
 
 const isCreateOrEditLeagueModalOpen = ref(false)
+const isRemoveLeagueConfirmationModalOpen = ref(false)
 const leagueToEdit = ref<League | undefined>(undefined)
 
 watch(leagueStore.leagues, () => {
@@ -49,6 +58,11 @@ onMounted(() => {
 onUnmounted(() => {
   leagueStore.unsubscribeFromLeagues()
 })
+
+function handleOnOpenConfirmationModal() {
+  isRemoveLeagueConfirmationModalOpen.value = true
+  isCreateOrEditLeagueModalOpen.value = false
+}
 
 function handleOpenLeagueModal(league?: League) {
   leagueToEdit.value = league
@@ -90,6 +104,7 @@ async function handleRemoveUserFromLeague(userId: string, leagueId: number) {
 
 async function handleRemoveLeague(leagueId: number) {
   await leagueStore.deleteLeague(leagueId)
+  isRemoveLeagueConfirmationModalOpen.value = false
 }
 
 function updateEditingLeague() {
