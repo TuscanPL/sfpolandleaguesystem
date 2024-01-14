@@ -38,6 +38,12 @@
       icon="la-file-signature-solid"
       @click="goTo(routerPaths.signUp)"
     />
+    <sidebar-item-component
+      v-if="isAdmin"
+      label="Panel administracyjny"
+      icon="la-user-shield-solid"
+      @click="goTo(routerPaths.adminPanel)" 
+    />
     <sidebar-login-indicator-component
       @logout-clicked="handleLogoutClicked"
       :user="user"
@@ -60,6 +66,7 @@ interface Props {
   isCookiePresent: boolean
   featureFlagConfigurationState: ConfigurationState
   isMobileView: boolean
+  isAdmin: boolean
 }
 
 interface Emits {

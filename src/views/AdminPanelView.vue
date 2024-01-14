@@ -18,7 +18,7 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/userStore'
-import { onMounted, ref } from 'vue'
+import { onMounted, onUnmounted, ref, watch } from 'vue'
 import { routerPaths } from '@/router/routes'
 import { useLeaguesStore } from '@/stores/leaguesStore'
 import LeagueManagementTableComponent from '@/components/AdminPanelView/LeagueManagementTableComponent.vue'
@@ -33,12 +33,21 @@ const router = useRouter()
 const isCreateOrEditLeagueModalOpen = ref(false)
 const leagueToEdit = ref<League | undefined>(undefined)
 
+watch(leagueStore.leagues, () => {
+  updateEditingLeague()
+}, { deep: true })
+
 onMounted(() => {
-  // if (!userStore.isAdmin) {
-  //   router.push(routerPaths.home)
-  // }
+  if (!userStore.isAdmin) {
+    router.push(routerPaths.home)
+  }
 
   leagueStore.getLeagues()
+  leagueStore.subscribeToLeagues()
+})
+
+onUnmounted(() => {
+  leagueStore.unsubscribeFromLeagues()
 })
 
 function handleOpenLeagueModal(league?: League) {
@@ -46,8 +55,8 @@ function handleOpenLeagueModal(league?: League) {
   isCreateOrEditLeagueModalOpen.value = true
 }
 
-function handleAddLeague(league: LeagueStub) {
-  leagueStore.createLeague(
+async function handleAddLeague(league: LeagueStub) {
+  await leagueStore.createLeague(
     league.leagueName,
     new Date(league.leagueStartDate),
     new Date(league.leagueEndDate)
@@ -56,12 +65,12 @@ function handleAddLeague(league: LeagueStub) {
   isCreateOrEditLeagueModalOpen.value = false
 }
 
-function handleEditLeague(league: LeagueStub) {
+async function handleEditLeague(league: LeagueStub) {
   if (league.id === undefined) {
     return // todo: handle error
   }
 
-  leagueStore.updateLeague(
+  await leagueStore.updateLeague(
     league.id,
     league.leagueName,
     new Date(league.leagueStartDate),
@@ -71,12 +80,20 @@ function handleEditLeague(league: LeagueStub) {
   isCreateOrEditLeagueModalOpen.value = false
 }
 
-function handleRemoveUserFromLeague(userId: string, leagueId: number) {
-  leagueStore.removeFromLeague(leagueId, userId)
+async function handleRemoveUserFromLeague(userId: string, leagueId: number) {
+  await leagueStore.removeFromLeague(leagueId, userId)
+  leagueToEdit.value?.leagueSignUps.splice(
+    leagueToEdit.value?.leagueSignUps.findIndex((u) => u.discordUserId === userId),
+    1
+  )
 }
 
-function handleRemoveLeague(leagueId: number) {
-  leagueStore.deleteLeague(leagueId)
+async function handleRemoveLeague(leagueId: number) {
+  await leagueStore.deleteLeague(leagueId)
+}
+
+function updateEditingLeague() {
+  leagueToEdit.value = leagueStore.leagues.find((l) => l.id === leagueToEdit.value?.id)
 }
 </script>
 <style lang=""></style>

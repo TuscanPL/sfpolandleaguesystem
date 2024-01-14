@@ -1,12 +1,82 @@
 import { supabase } from '@/common/supabase'
 import type { League } from '@/models/app/leagueModel'
-import type { Tables, TablesInsert } from '@/models/types/supabase'
-import type { QueryData } from '@supabase/supabase-js'
+import type { TablesInsert } from '@/models/types/supabase'
+import { RealtimeChannel, type QueryData, type RealtimePostgresChangesPayload } from '@supabase/supabase-js'
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { ref, triggerRef } from 'vue'
 
 export const useLeaguesStore = defineStore('leaguesStore', () => {
   const leagues = ref<League[]>([])
+  const leaguesChannel = ref<RealtimeChannel | null>(null)
+
+  function subscribeToLeagues(): void {
+    // Subscribing to deleted events doesn't pass a full payload when RLS is enabled, so we need to re-fetch the leagues. Dirty but works. //MDR
+    leaguesChannel.value = supabase
+      .channel('leagues')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'leagues' }, handleLeagueChanges)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'league_sign_ups' }, handleLeagueSignUpsChanges)
+      .subscribe()
+
+    async function handleLeagueChanges(payload: RealtimePostgresChangesPayload<{[key: string]: any;}>) {
+      let leagueIndex = -1;
+
+      switch (payload.eventType) {
+        case 'INSERT':
+          leagues.value.push({
+            id: payload.new.id,
+            createdAt: new Date(payload.new.created_at),
+            leagueName: payload.new.league_name,
+            leagueStartDate: new Date(payload.new.league_start_date ?? ''),
+            leagueEndDate: new Date(payload.new.league_end_date ?? ''),
+            leagueSignUps: []
+          } as League)
+          break;
+          case 'UPDATE':
+            leagueIndex = leagues.value.findIndex((league) => league.id === payload.new.id)
+            if (leagueIndex < 0) return
+
+            leagues.value[leagueIndex] = {
+              id: payload.new.id,
+              createdAt: new Date(payload.new.created_at),
+              leagueName: payload.new.league_name,
+              leagueStartDate: new Date(payload.new.league_start_date ?? ''),
+              leagueEndDate: new Date(payload.new.league_end_date ?? ''),
+              leagueSignUps: leagues.value[leagueIndex].leagueSignUps,
+            } as League
+            break;
+        case 'DELETE':
+          await getLeagues()
+          break;
+      }
+    }
+
+    async function handleLeagueSignUpsChanges(payload: RealtimePostgresChangesPayload<{[key: string]: any;}>) {
+      let leagueIndex = -1;
+      switch (payload.eventType) {
+        case 'INSERT':
+          leagueIndex = leagues.value.findIndex((league) => league.id === payload.new.league_id)
+          if (leagueIndex < 0) return
+
+          leagues.value[leagueIndex].leagueSignUps.push({
+            id: payload.new.id,
+            createdAt: new Date(payload.new.created_at),
+            discordName: payload.new.discord_name,
+            discordUserId: payload.new.user_id,
+            avatarUrl: payload.new.avatar_url
+          })
+          break;
+        case 'DELETE':
+          await getLeagues()
+          break;
+      }
+    }
+  }
+
+  function unsubscribeFromLeagues(): void {
+    if (!leaguesChannel.value) return
+    supabase.removeChannel(leaguesChannel.value as RealtimeChannel)
+    leaguesChannel.value = null
+  }
 
   async function getLeagues(): Promise<void> {
     const leaguesWithUsersQuery = supabase.from('leagues').select(`
@@ -155,6 +225,8 @@ export const useLeaguesStore = defineStore('leaguesStore', () => {
     createLeague,
     updateLeague,
     deleteLeague,
-    removeFromLeague
+    removeFromLeague,
+    subscribeToLeagues,
+    unsubscribeFromLeagues
   }
 })
