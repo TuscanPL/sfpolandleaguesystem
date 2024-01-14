@@ -32,17 +32,11 @@ import {
   FwbTableBody,
   FwbAvatar
 } from 'flowbite-vue'
+import { getTimeString } from '@/common/utils'
 
 interface Props {
   signedUpUsers: LeagueAssignedUser[]
 }
 
 defineProps<Props>()
-
-function getTimeString(createdAt: Date): string {
-  return `(${createdAt.getHours()}:${createdAt
-    .getMinutes()
-    .toString()
-    .padStart(2, '0')}) ${createdAt.toDateString()}`
-}
 </script>

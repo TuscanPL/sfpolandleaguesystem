@@ -15,6 +15,7 @@
           :is-cookie-present="userStore.isCookiePresent"
           :feature-flag-configuration-state="configurationStore.featureFlagStates"
           :isMobileView="isMobileView"
+          :is-admin="userStore.isAdmin"
           @click="hideDrawer"
         />
       </div>
@@ -34,6 +35,7 @@
         :is-cookie-present="userStore.isCookiePresent"
         :feature-flag-configuration-state="configurationStore.featureFlagStates"
         :isMobileView="isMobileView"
+        :is-admin="userStore.isAdmin"
       />
     </div>
     <div class="basis-auto w-full" @click="hideDrawer">
@@ -69,11 +71,12 @@ const drawerClass = computed(() => {
   }
 })
 
-onMounted(() => {
+onMounted(async () => {
   addEventListeners()
 
-  userStore.initalizeUser()
-  configurationStore.initializeConfigurationValues()
+  await configurationStore.initializeConfigurationValues()
+  await userStore.initalizeUser()
+  await userStore.setAdminStatus()
 })
 
 async function handleLogin() {

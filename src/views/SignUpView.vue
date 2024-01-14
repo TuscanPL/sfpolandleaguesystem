@@ -12,7 +12,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, computed } from 'vue'
+import { onMounted, computed, onUnmounted } from 'vue'
 import { useLeaguesStore } from '@/stores/leaguesStore'
 import LeagueTileComponent from '@/components/SignUpView/LeagueTileComponent.vue'
 import { useUserStore } from '@/stores/userStore'
@@ -26,24 +26,23 @@ const user = computed(() => {
 })
 
 onMounted(() => {
-  initializeLeagues()
+  leagueStore.getLeagues()
+  leagueStore.subscribeToLeagues()
+})
+
+onUnmounted(() => {
+  leagueStore.unsubscribeFromLeagues()
 })
 
 async function handleLeagueSignUp(leagueId: number) {
   if (!userStore.user) return
 
   await leagueStore.signUpForLeague(leagueId, userStore.user.globalName, userStore.user.avatarUrl)
-  initializeLeagues()
 }
 
 async function handleLeagueSignOut(leagueId: number) {
   if (!userStore.user) return
 
   await leagueStore.signOutFromLeague(leagueId)
-  initializeLeagues()
-}
-
-function initializeLeagues() {
-  leagueStore.initalizeLeagues()
 }
 </script>
