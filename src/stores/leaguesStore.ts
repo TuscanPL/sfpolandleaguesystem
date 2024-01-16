@@ -1,11 +1,15 @@
 import { supabase } from '@/common/supabase'
-import type { League } from '@/models/app/leagueModel'
+import { generateRoundRobinSchedule } from '@/common/tournamentUtils'
+import { LeagueStatus, type League } from '@/models/app/leagueModel'
 import type { TablesInsert } from '@/models/types/supabase'
 import { RealtimeChannel, type QueryData, type RealtimePostgresChangesPayload } from '@supabase/supabase-js'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
+import { useMatchesStore } from './matchesStore'
 
 export const useLeaguesStore = defineStore('leaguesStore', () => {
+  const matchesStore = useMatchesStore()
+
   const leagues = ref<League[]>([])
   const leaguesChannel = ref<RealtimeChannel | null>(null)
 
@@ -28,7 +32,8 @@ export const useLeaguesStore = defineStore('leaguesStore', () => {
             leagueName: payload.new.league_name,
             leagueStartDate: new Date(payload.new.league_start_date ?? ''),
             leagueEndDate: new Date(payload.new.league_end_date ?? ''),
-            leagueSignUps: []
+            leagueSignUps: [],
+            leagueStatus: payload.new.status as LeagueStatus
           } as League)
           break;
           case 'UPDATE':
@@ -42,6 +47,7 @@ export const useLeaguesStore = defineStore('leaguesStore', () => {
               leagueStartDate: new Date(payload.new.league_start_date ?? ''),
               leagueEndDate: new Date(payload.new.league_end_date ?? ''),
               leagueSignUps: leagues.value[leagueIndex].leagueSignUps,
+              leagueStatus: payload.new.status as LeagueStatus
             } as League
             break;
         case 'DELETE':
@@ -107,6 +113,7 @@ export const useLeaguesStore = defineStore('leaguesStore', () => {
         leagueName: league.league_name,
         leagueStartDate: new Date(league.league_start_date ?? ''),
         leagueEndDate: new Date(league.league_end_date ?? ''),
+        leagueStatus: league.status as LeagueStatus,
         leagueSignUps: league.league_sign_ups.map((user) => {
           return {
             avatarUrl: user.avatar_url,
@@ -217,6 +224,53 @@ export const useLeaguesStore = defineStore('leaguesStore', () => {
     return data
   }
 
+  async function startLeague(leagueId: number): Promise<null> {
+    const leaguePlayers = leagues.value.find((league) => league.id === leagueId)?.leagueSignUps
+    
+    if (!leaguePlayers || leaguePlayers.length < 2) 
+      return Promise.reject('No players found')
+
+    const leagueMatches = generateRoundRobinSchedule(leaguePlayers, leagueId)
+
+    try {
+      await matchesStore.createLeagueMatches(leagueMatches)
+    } 
+    catch (error) {
+      return Promise.reject(error)
+    }
+
+    const { data, error } = await supabase
+      .from('leagues')
+      .update({ status: LeagueStatus.Started })
+      .eq('id', leagueId)
+
+    if (error) {
+      return Promise.reject(error)
+    }
+
+    return data
+  }
+
+  async function stopLeague(leagueId: number): Promise<null> {
+    try {
+      await matchesStore.removeLeagueMatches(leagueId)
+    } 
+    catch (error) {
+      return Promise.reject(error)
+    }
+
+    const { data, error } = await supabase
+      .from('leagues')
+      .update({ status: LeagueStatus.Draft })
+      .eq('id', leagueId)
+
+    if (error) {
+      return Promise.reject(error)
+    }
+
+    return data
+  }
+
   return {
     signUpForLeague,
     getLeagues,
@@ -227,6 +281,8 @@ export const useLeaguesStore = defineStore('leaguesStore', () => {
     deleteLeague,
     removeFromLeague,
     subscribeToLeagues,
-    unsubscribeFromLeagues
+    unsubscribeFromLeagues,
+    startLeague,
+    stopLeague
   }
 })

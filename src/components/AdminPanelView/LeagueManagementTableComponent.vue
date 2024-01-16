@@ -22,6 +22,27 @@
           >
             Edytuj
           </fwb-button>
+          <fwb-button
+            v-if="league.leagueStatus === LeagueStatus.Draft"
+            class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition ml-2"
+            @click="onStartLeague(league?.id)"
+          >
+            <v-icon name="la-play-solid" />
+          </fwb-button>
+          <fwb-button
+            v-else-if="league.leagueStatus === LeagueStatus.Started"
+            class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition ml-2"
+            @click="onStopLeague(league?.id)"
+          >
+            <v-icon name="la-stop-solid" />
+          </fwb-button>
+          <fwb-button
+            v-else
+            class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition ml-2"
+            @click="onRemoveLeague(league?.id)"
+          >
+            <v-icon name="la-trash-alt-solid" />
+          </fwb-button>
         </fwb-table-cell>
       </fwb-table-row>
       <fwb-table-row>
@@ -38,7 +59,7 @@
   </fwb-table>
 </template>
 <script setup lang="ts">
-import type { League } from '@/models/app/leagueModel'
+import { LeagueStatus, type League } from '@/models/app/leagueModel'
 import {
   FwbTable,
   FwbTableHead,
@@ -55,7 +76,10 @@ interface Props {
 }
 
 interface Emits {
-  (event: 'onOpenLeagueModal', league?: League): void
+  (event: 'onOpenLeagueModal', league?: League): void,
+  (event: 'onStartLeague', leagueId: number): void
+  (event: 'onStopLeague', leagueId: number): void
+  (event: 'onRemoveLeague', leagueId: number): void
 }
 
 defineProps<Props>()
@@ -64,5 +88,29 @@ const emits = defineEmits<Emits>()
 
 function handleOpenLeagueModal(league?: League) {
   emits('onOpenLeagueModal', league)
+}
+
+function onStartLeague(leagueId: number | undefined) {
+  if (!leagueId) {
+    return // todo: handle error
+  }
+
+  emits('onStartLeague', leagueId)
+}
+
+function onStopLeague(leagueId: number | undefined) {
+  if (!leagueId) {
+    return // todo: handle error
+  }
+
+  emits('onStopLeague', leagueId)
+}
+
+function onRemoveLeague(leagueId: number | undefined) {
+  if (!leagueId) {
+    return // todo: handle error
+  }
+
+  emits('onRemoveLeague', leagueId)
 }
 </script>

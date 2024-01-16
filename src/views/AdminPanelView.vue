@@ -2,7 +2,10 @@
   <div class="p-3">
     <LeagueManagementTableComponent
       :leagues="leagueStore.leagues"
-      :onOnOpenLeagueModal="handleOpenLeagueModal"
+      @on-open-league-modal="handleOpenLeagueModal"
+      @on-start-league="handleStartLeague"
+      @on-stop-league="handleStopLeague"
+      @on-remove-league="handleRemoveLeagueFromTable"
     />
     <CreateOrEditLeagueModalComponent
       :isOpen="isCreateOrEditLeagueModalOpen"
@@ -67,6 +70,20 @@ function handleOnOpenConfirmationModal() {
 function handleOpenLeagueModal(league?: League) {
   leagueToEdit.value = league
   isCreateOrEditLeagueModalOpen.value = true
+}
+
+async function handleStartLeague(leagueId: number) {
+  await leagueStore.startLeague(leagueId)
+}
+
+async function handleStopLeague(leagueId: number) {
+  await leagueStore.stopLeague(leagueId)
+}
+
+function handleRemoveLeagueFromTable(leagueId: number) {
+  leagueToEdit.value = leagueStore.leagues.find((l) => l.id === leagueId)
+  updateEditingLeague()
+  handleOnOpenConfirmationModal()
 }
 
 async function handleAddLeague(league: LeagueStub) {

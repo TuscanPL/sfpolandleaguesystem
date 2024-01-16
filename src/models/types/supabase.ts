@@ -56,6 +56,64 @@ export interface Database {
           }
         ]
       }
+      league_matches: {
+        Row: {
+          created_at: string
+          id: number
+          league_id: number | null
+          match_status: Database["public"]["Enums"]["match_status"]
+          player1_discordid: string | null
+          player1_score: number
+          player2_discordid: string | null
+          player2_score: number
+          replay_ids: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          league_id?: number | null
+          match_status?: Database["public"]["Enums"]["match_status"]
+          player1_discordid?: string | null
+          player1_score?: number
+          player2_discordid?: string | null
+          player2_score?: number
+          replay_ids?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          league_id?: number | null
+          match_status?: Database["public"]["Enums"]["match_status"]
+          player1_discordid?: string | null
+          player1_score?: number
+          player2_discordid?: string | null
+          player2_score?: number
+          replay_ids?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "league_matches_league_id_fkey"
+            columns: ["league_id"]
+            isOneToOne: false
+            referencedRelation: "leagues"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "league_matches_player1_discordid_fkey"
+            columns: ["player1_discordid"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "league_matches_player2_discordid_fkey"
+            columns: ["player2_discordid"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       league_sign_ups: {
         Row: {
           avatar_url: string | null
@@ -127,7 +185,7 @@ export interface Database {
     }
     Enums: {
       league_status: "draft" | "started" | "completed"
-      match_status: "Upcoming" | "Completed" | "Cancelled"
+      match_status: "upcoming" | "completed" | "cancelled"
     }
     CompositeTypes: {
       [_ in never]: never
