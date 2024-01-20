@@ -40,8 +40,7 @@ const routes = [
   {
     path: routerPaths.upcomingMatches,
     name: 'upcomingMatches',
-    component: upcomingMatches,
-    redirect: { name: 'signUp' }
+    component: upcomingMatches
   },
   {
     path: routerPaths.userSettings,

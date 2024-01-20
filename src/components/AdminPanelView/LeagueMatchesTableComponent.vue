@@ -11,9 +11,11 @@
     <fwb-table-body>
       <fwb-table-row v-for="match in matches" :key="match.id">
         <fwb-table-cell class="font-normal">{{
-          getPlayerNameByDiscordId(match.player1Discordid)
+          getPlayerNameByDiscordId(match.player1Discordid, leagueSignUps)
         }}</fwb-table-cell>
-        <fwb-table-cell>{{ getPlayerNameByDiscordId(match.player2Discordid) }}</fwb-table-cell>
+        <fwb-table-cell>{{
+          getPlayerNameByDiscordId(match.player2Discordid, leagueSignUps)
+        }}</fwb-table-cell>
         <fwb-table-cell>{{ getMatchScore(match) }}</fwb-table-cell>
         <fwb-table-cell>{{ getMatchReplayIds(match) }}</fwb-table-cell>
         <fwb-table-cell>{{ match.matchStatus }}</fwb-table-cell>
@@ -50,6 +52,7 @@ import { type LeagueMatch } from '@/models/app/matchModel'
 import type { LeagueAssignedUser } from '@/models/app/leagueModel'
 import EditMatchModalComponent from './EditMatchModalComponent.vue'
 import { ref } from 'vue'
+import { getPlayerNameByDiscordId } from '@/common/tournamentUtils'
 
 interface Props {
   matches?: LeagueMatch[]
@@ -65,14 +68,6 @@ const emits = defineEmits<Emits>()
 
 const isEditMatchModalOpen = ref(false)
 const matchToEdit = ref<LeagueMatch>()
-
-function getPlayerNameByDiscordId(discordId?: string) {
-  if (!discordId || discordId?.length === 0) {
-    return '-'
-  }
-
-  return props.leagueSignUps?.find((x) => x.discordUserId === discordId)?.discordName ?? '-'
-}
 
 function getMatchScore(match: LeagueMatch) {
   return `${match.player1Score} - ${match.player2Score}`

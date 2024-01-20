@@ -54,3 +54,11 @@ function getDiscordUserIdOrUndefined(discordUserId: string): string | undefined 
 
   return discordUserId
 }
+
+export function getPlayerNameByDiscordId(discordId?: string, leagueSignUps?: LeagueAssignedUser[]) {
+  if (!discordId || discordId?.length === 0) {
+    return '-'
+  }
+
+  return leagueSignUps?.find((x) => x.discordUserId === discordId)?.discordName ?? '-'
+}
