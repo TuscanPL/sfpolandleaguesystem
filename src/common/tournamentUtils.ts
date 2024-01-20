@@ -6,28 +6,18 @@ export function generateRoundRobinSchedule(
   originalPlayers: LeagueAssignedUser[],
   leagueId: number
 ): LeagueMatchStub[] {
-  // Create a copy of the players array
-  const players = originalPlayers.slice()
-
-  // If the number of players is odd, add a "dummy" player for byes
-  if (players.length % 2 !== 0) {
-    players.push({
-      avatarUrl: '',
-      createdAt: new Date(),
-      discordName: 'Bye',
-      discordUserId: '',
-      id: -1
-    })
-  }
-
   const matches: LeagueMatchStub[] = []
-  for (let round = 0; round < players.length - 1; round++) {
-    for (let i = 0; i < players.length / 2; i++) {
+
+  const alreadyGeneratedPlayers: string[] = []
+  for (let i = 0; i < originalPlayers.length; i++) {
+    for (let j = i + 1; j < originalPlayers.length; j++) {
+      if (alreadyGeneratedPlayers.includes(originalPlayers[j].discordUserId)) {
+        continue
+      }
+
       const match: LeagueMatchStub = {
-        player1Discordid: getDiscordUserIdOrUndefined(players[i].discordUserId),
-        player2Discordid: getDiscordUserIdOrUndefined(
-          players[players.length - 1 - i].discordUserId
-        ),
+        player1Discordid: getDiscordUserIdOrUndefined(originalPlayers[i].discordUserId),
+        player2Discordid: getDiscordUserIdOrUndefined(originalPlayers[j].discordUserId),
         player1Score: 0,
         player2Score: 0,
         matchStatus: 'upcoming' as MatchStatus,
@@ -37,11 +27,7 @@ export function generateRoundRobinSchedule(
       matches.push(match)
     }
 
-    // Rotate the array, keeping the first player fixed
-    const firstPlayer = players.shift()
-    const secondPlayer = players.shift()
-    players.push(firstPlayer!)
-    players.unshift(secondPlayer!)
+    alreadyGeneratedPlayers.push(originalPlayers[i].discordUserId)
   }
 
   return matches

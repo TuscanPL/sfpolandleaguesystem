@@ -22,11 +22,8 @@ interface Props {
 const props = defineProps<Props>()
 
 const versusPlayerName = computed(() => {
-  let playerName = getPlayerNameByDiscordId(props.match?.player2Discordid, props.leagueSignUps)
-  if (playerName === props.currentUser?.globalName) {
-    playerName = getPlayerNameByDiscordId(props.match?.player1Discordid, props.leagueSignUps)
-  }
-
-  return playerName
+  return props.currentUser?.userId === props.match?.player1Discordid
+    ? getPlayerNameByDiscordId(props.match?.player2Discordid, props.leagueSignUps)
+    : getPlayerNameByDiscordId(props.match?.player1Discordid, props.leagueSignUps)
 })
 </script>
