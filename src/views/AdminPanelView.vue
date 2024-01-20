@@ -2,10 +2,12 @@
   <div class="p-3">
     <LeagueManagementTableComponent
       :leagues="leagueStore.leagues"
+      :matches="matchesStore.matches"
       @on-open-league-modal="handleOpenLeagueModal"
       @on-start-league="handleOpenStartLeagueConfirmationModal"
       @on-stop-league="handleOpenStopLeagueConfirmationModal"
       @on-remove-league="handleRemoveLeagueFromTable"
+      @on-edit-match="updateMatch"
     />
     <CreateOrEditLeagueModalComponent
       :isOpen="isCreateOrEditLeagueModalOpen"
@@ -56,9 +58,12 @@ import type { LeagueStub } from '@/models/app/leagueStubModel'
 import type { League } from '@/models/app/leagueModel'
 import RemoveLeagueConfirmationModalComponent from '@/components/AdminPanelView/RemoveLeagueConfirmationModalComponent.vue'
 import ConfirmationModalComponent from '@/components/common/ConfirmationModalComponent.vue'
+import { useMatchesStore } from '@/stores/matchesStore'
+import type { LeagueMatch } from '@/models/app/matchModel'
 
 const userStore = useUserStore()
 const leagueStore = useLeaguesStore()
+const matchesStore = useMatchesStore()
 const router = useRouter()
 
 const isCreateOrEditLeagueModalOpen = ref(false)
@@ -95,10 +100,14 @@ onMounted(() => {
 
   leagueStore.getLeagues()
   leagueStore.subscribeToLeagues()
+
+  matchesStore.getAllMatches()
+  matchesStore.subscribeToMatches()
 })
 
 onUnmounted(() => {
   leagueStore.unsubscribeFromLeagues()
+  matchesStore.unsubscribeFromMatches()
 })
 
 function handleOpenStartLeagueConfirmationModal(leagueId?: number) {
@@ -189,6 +198,10 @@ async function handleRemoveUserFromLeague(userId: string, leagueId: number) {
 async function handleRemoveLeague(leagueId: number) {
   await leagueStore.deleteLeague(leagueId)
   isRemoveLeagueConfirmationModalOpen.value = false
+}
+
+async function updateMatch(match: LeagueMatch) {
+  await matchesStore.updateLeagueMatch(match)
 }
 
 function updateEditingLeague() {

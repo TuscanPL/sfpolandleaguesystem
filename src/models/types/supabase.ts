@@ -97,20 +97,6 @@ export interface Database {
             isOneToOne: false
             referencedRelation: "leagues"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "league_matches_player1_discordid_fkey"
-            columns: ["player1_discordid"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "league_matches_player2_discordid_fkey"
-            columns: ["player2_discordid"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
           }
         ]
       }
@@ -185,7 +171,7 @@ export interface Database {
     }
     Enums: {
       league_status: "draft" | "started" | "completed"
-      match_status: "upcoming" | "completed" | "cancelled"
+      match_status: "upcoming" | "completed" | "canceled" | "in_progress"
     }
     CompositeTypes: {
       [_ in never]: never
