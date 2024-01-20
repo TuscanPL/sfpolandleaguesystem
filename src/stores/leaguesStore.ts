@@ -8,7 +8,7 @@ import {
   type RealtimePostgresChangesPayload
 } from '@supabase/supabase-js'
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useMatchesStore } from './matchesStore'
 
 export const useLeaguesStore = defineStore('leaguesStore', () => {
@@ -16,6 +16,10 @@ export const useLeaguesStore = defineStore('leaguesStore', () => {
 
   const leagues = ref<League[]>([])
   const leaguesChannel = ref<RealtimeChannel | null>(null)
+
+  const isAnyLeagueActive = computed(() => {
+    return leagues.value.some((league) => league.leagueStatus === LeagueStatus.Started)
+  })
 
   function subscribeToLeagues(): void {
     // Subscribing to deleted events doesn't pass a full payload when RLS is enabled, so we need to re-fetch the leagues. Dirty but works. //MDR
@@ -296,6 +300,7 @@ export const useLeaguesStore = defineStore('leaguesStore', () => {
     subscribeToLeagues,
     unsubscribeFromLeagues,
     startLeague,
-    stopLeague
+    stopLeague,
+    isAnyLeagueActive
   }
 })

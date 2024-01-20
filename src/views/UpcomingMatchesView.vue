@@ -13,7 +13,7 @@
 import UpcomingMatchesComponent from '@/components/UpcomingMatchesView/UpcomingMatchesComponent.vue'
 import { useMatchesStore } from '@/stores/matchesStore'
 import { useLeaguesStore } from '@/stores/leaguesStore'
-import { computed, onMounted } from 'vue'
+import { onMounted } from 'vue'
 import { useUserStore } from '@/stores/userStore'
 
 const matchesStore = useMatchesStore()
