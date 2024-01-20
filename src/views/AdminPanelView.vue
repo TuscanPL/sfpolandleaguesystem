@@ -3,8 +3,8 @@
     <LeagueManagementTableComponent
       :leagues="leagueStore.leagues"
       @on-open-league-modal="handleOpenLeagueModal"
-      @on-start-league="handleStartLeague"
-      @on-stop-league="handleStopLeague"
+      @on-start-league="handleOpenStartLeagueConfirmationModal"
+      @on-stop-league="handleOpenStopLeagueConfirmationModal"
       @on-remove-league="handleRemoveLeagueFromTable"
     />
     <CreateOrEditLeagueModalComponent
@@ -22,13 +22,32 @@
       :isOpen="isRemoveLeagueConfirmationModalOpen"
       @onRemoveLeague="handleRemoveLeague"
       @close="isRemoveLeagueConfirmationModalOpen = false"
-      />
+    />
+    <ConfirmationModalComponent
+      :is-open="isConfirmLeagueStartModalOpen"
+      :title="currentEditingLeagueTitle"
+      :text="startLeagueConfirmationModalText"
+      confirm-button-text="Wystartuj ligę"
+      cancel-button-text="Anuluj"
+      @on-confirm="handleStartLeague(leagueToEdit?.id)"
+      @on-cancel="isConfirmLeagueStartModalOpen = false"
+    />
+    <ConfirmationModalComponent
+      :is-open="isConfirmLeagueStopModalOpen"
+      :title="currentEditingLeagueTitle"
+      :text="stopLeagueConfirmationModalText"
+      subtext="Uwaga: zatrzymanie ligi spowoduje usunięcie wszystkich jej wyników."
+      confirm-button-text="Zatrzymaj ligę"
+      cancel-button-text="Anuluj"
+      @on-confirm="handleStopLeague(leagueToEdit?.id)"
+      @on-cancel="isConfirmLeagueStopModalOpen = false"
+    />
   </div>
 </template>
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/userStore'
-import { onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { routerPaths } from '@/router/routes'
 import { useLeaguesStore } from '@/stores/leaguesStore'
 import LeagueManagementTableComponent from '@/components/AdminPanelView/LeagueManagementTableComponent.vue'
@@ -36,6 +55,7 @@ import CreateOrEditLeagueModalComponent from '@/components/AdminPanelView/Create
 import type { LeagueStub } from '@/models/app/leagueStubModel'
 import type { League } from '@/models/app/leagueModel'
 import RemoveLeagueConfirmationModalComponent from '@/components/AdminPanelView/RemoveLeagueConfirmationModalComponent.vue'
+import ConfirmationModalComponent from '@/components/common/ConfirmationModalComponent.vue'
 
 const userStore = useUserStore()
 const leagueStore = useLeaguesStore()
@@ -43,11 +63,30 @@ const router = useRouter()
 
 const isCreateOrEditLeagueModalOpen = ref(false)
 const isRemoveLeagueConfirmationModalOpen = ref(false)
+const isConfirmLeagueStartModalOpen = ref(false)
+const isConfirmLeagueStopModalOpen = ref(false)
+
 const leagueToEdit = ref<League | undefined>(undefined)
 
-watch(leagueStore.leagues, () => {
-  updateEditingLeague()
-}, { deep: true })
+const currentEditingLeagueTitle = computed(() => {
+  return leagueToEdit.value?.leagueName ?? ''
+})
+
+const startLeagueConfirmationModalText = computed(() => {
+  return `Czy chcesz wystartować ligę ${leagueToEdit.value?.leagueName ?? ''}?`
+})
+
+const stopLeagueConfirmationModalText = computed(() => {
+  return `Czy chcesz zatrzymać ligę ${leagueToEdit.value?.leagueName ?? ''}?`
+})
+
+watch(
+  leagueStore.leagues,
+  () => {
+    updateEditingLeague()
+  },
+  { deep: true }
+)
 
 onMounted(() => {
   if (!userStore.isAdmin) {
@@ -62,6 +101,24 @@ onUnmounted(() => {
   leagueStore.unsubscribeFromLeagues()
 })
 
+function handleOpenStartLeagueConfirmationModal(leagueId?: number) {
+  if (!leagueId) {
+    return // todo: handle error
+  }
+
+  setEditingLeague(leagueId)
+  isConfirmLeagueStartModalOpen.value = true
+}
+
+function handleOpenStopLeagueConfirmationModal(leagueId?: number) {
+  if (!leagueId) {
+    return // todo: handle error
+  }
+
+  setEditingLeague(leagueId)
+  isConfirmLeagueStopModalOpen.value = true
+}
+
 function handleOnOpenConfirmationModal() {
   isRemoveLeagueConfirmationModalOpen.value = true
   isCreateOrEditLeagueModalOpen.value = false
@@ -72,12 +129,22 @@ function handleOpenLeagueModal(league?: League) {
   isCreateOrEditLeagueModalOpen.value = true
 }
 
-async function handleStartLeague(leagueId: number) {
+async function handleStartLeague(leagueId?: number) {
+  if (!leagueId) {
+    return // todo: handle error
+  }
+
   await leagueStore.startLeague(leagueId)
+  isConfirmLeagueStartModalOpen.value = false
 }
 
-async function handleStopLeague(leagueId: number) {
+async function handleStopLeague(leagueId?: number) {
+  if (!leagueId) {
+    return // todo: handle error
+  }
+
   await leagueStore.stopLeague(leagueId)
+  isConfirmLeagueStopModalOpen.value = false
 }
 
 function handleRemoveLeagueFromTable(leagueId: number) {
@@ -126,6 +193,10 @@ async function handleRemoveLeague(leagueId: number) {
 
 function updateEditingLeague() {
   leagueToEdit.value = leagueStore.leagues.find((l) => l.id === leagueToEdit.value?.id)
+}
+
+function setEditingLeague(leagueId: number) {
+  leagueToEdit.value = leagueStore.leagues.find((l) => l.id === leagueId)
 }
 </script>
 <style lang=""></style>
