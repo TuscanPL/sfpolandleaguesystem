@@ -1,7 +1,8 @@
 import type { UserCookie } from '@/models/app/userCookieModel'
+import { envConfig } from './envVariables'
 
 function getUserCookie(): string | null {
-  return localStorage.getItem('sb-127-auth-token')
+  return localStorage.getItem(envConfig.cookieKey)
 }
 
 function getMappedUserCookie(userCookieStringified?: string): UserCookie | null {
