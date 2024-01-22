@@ -21,6 +21,7 @@
               <fwb-button
                 class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition"
                 @click="removeUserFromLeague(user.discordUserId, props.league?.id)"
+                :disabled="league?.leagueStatus !== LeagueStatus.Draft"
               >
                 Usuń
               </fwb-button>
@@ -66,6 +67,7 @@ import VueDatePicker from '@vuepic/vue-datepicker'
 import '@vuepic/vue-datepicker/dist/main.css'
 import { ref, computed } from 'vue'
 import { whenever } from '@vueuse/core'
+import { LeagueStatus } from '@/models/app/leagueModel'
 
 interface Props {
   isOpen: boolean

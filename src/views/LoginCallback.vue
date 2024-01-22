@@ -20,7 +20,7 @@ function checkForCookie() {
   if (!userStore.isCookiePresent) {
     setTimeout(() => {
       window.location.reload()
-    }, 2000)
+    }, 5000)
   } else {
     router.push(routerPaths.home)
   }

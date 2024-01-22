@@ -1,11 +1,37 @@
 <template>
-    <div>
-        <span>Upcoming matches in the making...</span>
-    </div>
+  <div class="w-full">
+    <upcoming-matches-component
+      v-for="league in leaguesStore.leagues"
+      :key="league.id"
+      :league-matches="getPlayerMatchesByLeagueAndUser(league.id)"
+      :current-user="userStore.user"
+      :league-sign-ups="league.leagueSignUps"
+    />
+  </div>
 </template>
 <script setup lang="ts">
+import UpcomingMatchesComponent from '@/components/UpcomingMatchesView/UpcomingMatchesComponent.vue'
+import { useMatchesStore } from '@/stores/matchesStore'
+import { useLeaguesStore } from '@/stores/leaguesStore'
+import { onMounted } from 'vue'
+import { useUserStore } from '@/stores/userStore'
 
+const matchesStore = useMatchesStore()
+const leaguesStore = useLeaguesStore()
+const userStore = useUserStore()
+
+function getPlayerMatchesByLeagueAndUser(leagueId: number) {
+  return matchesStore.matches.filter((match) => {
+    return (
+      (match.player1Discordid === userStore.user?.userId ||
+        match.player2Discordid === userStore.user?.userId) &&
+      match.leagueId === leagueId
+    )
+  })
+}
+
+onMounted(async () => {
+  await leaguesStore.getLeagues()
+  await matchesStore.getAllMatches()
+})
 </script>
-<style lang="css">
-    
-</style>

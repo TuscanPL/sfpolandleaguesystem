@@ -1,24 +1,46 @@
 import { supabase } from '@/common/supabase'
-import type { League } from '@/models/app/leagueModel'
+import { generateRoundRobinSchedule } from '@/common/tournamentUtils'
+import { LeagueStatus, type League } from '@/models/app/leagueModel'
 import type { TablesInsert } from '@/models/types/supabase'
-import { RealtimeChannel, type QueryData, type RealtimePostgresChangesPayload } from '@supabase/supabase-js'
+import {
+  RealtimeChannel,
+  type QueryData,
+  type RealtimePostgresChangesPayload
+} from '@supabase/supabase-js'
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
+import { useMatchesStore } from './matchesStore'
 
 export const useLeaguesStore = defineStore('leaguesStore', () => {
+  const matchesStore = useMatchesStore()
+
   const leagues = ref<League[]>([])
   const leaguesChannel = ref<RealtimeChannel | null>(null)
+
+  const isAnyLeagueActive = computed(() => {
+    return leagues.value.some((league) => league.leagueStatus === LeagueStatus.Started)
+  })
 
   function subscribeToLeagues(): void {
     // Subscribing to deleted events doesn't pass a full payload when RLS is enabled, so we need to re-fetch the leagues. Dirty but works. //MDR
     leaguesChannel.value = supabase
       .channel('leagues')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'leagues' }, handleLeagueChanges)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'league_sign_ups' }, handleLeagueSignUpsChanges)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'leagues' },
+        handleLeagueChanges
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'league_sign_ups' },
+        handleLeagueSignUpsChanges
+      )
       .subscribe()
 
-    async function handleLeagueChanges(payload: RealtimePostgresChangesPayload<{[key: string]: any;}>) {
-      let leagueIndex = -1;
+    async function handleLeagueChanges(
+      payload: RealtimePostgresChangesPayload<{ [key: string]: any }>
+    ) {
+      let leagueIndex = -1
 
       switch (payload.eventType) {
         case 'INSERT':
@@ -28,30 +50,34 @@ export const useLeaguesStore = defineStore('leaguesStore', () => {
             leagueName: payload.new.league_name,
             leagueStartDate: new Date(payload.new.league_start_date ?? ''),
             leagueEndDate: new Date(payload.new.league_end_date ?? ''),
-            leagueSignUps: []
+            leagueSignUps: [],
+            leagueStatus: payload.new.status as LeagueStatus
           } as League)
-          break;
-          case 'UPDATE':
-            leagueIndex = leagues.value.findIndex((league) => league.id === payload.new.id)
-            if (leagueIndex < 0) return
+          break
+        case 'UPDATE':
+          leagueIndex = leagues.value.findIndex((league) => league.id === payload.new.id)
+          if (leagueIndex < 0) return
 
-            leagues.value[leagueIndex] = {
-              id: payload.new.id,
-              createdAt: new Date(payload.new.created_at),
-              leagueName: payload.new.league_name,
-              leagueStartDate: new Date(payload.new.league_start_date ?? ''),
-              leagueEndDate: new Date(payload.new.league_end_date ?? ''),
-              leagueSignUps: leagues.value[leagueIndex].leagueSignUps,
-            } as League
-            break;
+          leagues.value[leagueIndex] = {
+            id: payload.new.id,
+            createdAt: new Date(payload.new.created_at),
+            leagueName: payload.new.league_name,
+            leagueStartDate: new Date(payload.new.league_start_date ?? ''),
+            leagueEndDate: new Date(payload.new.league_end_date ?? ''),
+            leagueSignUps: leagues.value[leagueIndex].leagueSignUps,
+            leagueStatus: payload.new.status as LeagueStatus
+          } as League
+          break
         case 'DELETE':
           await getLeagues()
-          break;
+          break
       }
     }
 
-    async function handleLeagueSignUpsChanges(payload: RealtimePostgresChangesPayload<{[key: string]: any;}>) {
-      let leagueIndex = -1;
+    async function handleLeagueSignUpsChanges(
+      payload: RealtimePostgresChangesPayload<{ [key: string]: any }>
+    ) {
+      let leagueIndex = -1
       switch (payload.eventType) {
         case 'INSERT':
           leagueIndex = leagues.value.findIndex((league) => league.id === payload.new.league_id)
@@ -64,10 +90,10 @@ export const useLeaguesStore = defineStore('leaguesStore', () => {
             discordUserId: payload.new.user_id,
             avatarUrl: payload.new.avatar_url
           })
-          break;
+          break
         case 'DELETE':
           await getLeagues()
-          break;
+          break
       }
     }
   }
@@ -107,6 +133,7 @@ export const useLeaguesStore = defineStore('leaguesStore', () => {
         leagueName: league.league_name,
         leagueStartDate: new Date(league.league_start_date ?? ''),
         leagueEndDate: new Date(league.league_end_date ?? ''),
+        leagueStatus: league.status as LeagueStatus,
         leagueSignUps: league.league_sign_ups.map((user) => {
           return {
             avatarUrl: user.avatar_url,
@@ -217,6 +244,50 @@ export const useLeaguesStore = defineStore('leaguesStore', () => {
     return data
   }
 
+  async function startLeague(leagueId: number): Promise<null> {
+    const leaguePlayers = leagues.value.find((league) => league.id === leagueId)?.leagueSignUps
+
+    if (!leaguePlayers || leaguePlayers.length < 2) return Promise.reject('No players found')
+
+    const leagueMatches = generateRoundRobinSchedule(leaguePlayers, leagueId)
+
+    try {
+      await matchesStore.createLeagueMatches(leagueMatches)
+    } catch (error) {
+      return Promise.reject(error)
+    }
+
+    const { data, error } = await supabase
+      .from('leagues')
+      .update({ status: LeagueStatus.Started })
+      .eq('id', leagueId)
+
+    if (error) {
+      return Promise.reject(error)
+    }
+
+    return data
+  }
+
+  async function stopLeague(leagueId: number): Promise<null> {
+    try {
+      await matchesStore.removeLeagueMatches(leagueId)
+    } catch (error) {
+      return Promise.reject(error)
+    }
+
+    const { data, error } = await supabase
+      .from('leagues')
+      .update({ status: LeagueStatus.Draft })
+      .eq('id', leagueId)
+
+    if (error) {
+      return Promise.reject(error)
+    }
+
+    return data
+  }
+
   return {
     signUpForLeague,
     getLeagues,
@@ -227,6 +298,9 @@ export const useLeaguesStore = defineStore('leaguesStore', () => {
     deleteLeague,
     removeFromLeague,
     subscribeToLeagues,
-    unsubscribeFromLeagues
+    unsubscribeFromLeagues,
+    startLeague,
+    stopLeague,
+    isAnyLeagueActive
   }
 })

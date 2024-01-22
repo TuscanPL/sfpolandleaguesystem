@@ -1,7 +1,7 @@
 import type { UserCookie } from '@/models/app/userCookieModel'
 
 function getUserCookie(): string | null {
-  return localStorage.getItem('sb-szdfoftdifsvtiacvxuw-auth-token')
+  return localStorage.getItem('sb-127-auth-token')
 }
 
 function getMappedUserCookie(userCookieStringified?: string): UserCookie | null {

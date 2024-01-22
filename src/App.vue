@@ -16,6 +16,7 @@
           :feature-flag-configuration-state="configurationStore.featureFlagStates"
           :isMobileView="isMobileView"
           :is-admin="userStore.isAdmin"
+          :is-any-league-active="leaguesStore.isAnyLeagueActive"
           @click="hideDrawer"
         />
       </div>
@@ -35,6 +36,7 @@
         :is-cookie-present="userStore.isCookiePresent"
         :feature-flag-configuration-state="configurationStore.featureFlagStates"
         :isMobileView="isMobileView"
+        :is-any-league-active="leaguesStore.isAnyLeagueActive"
         :is-admin="userStore.isAdmin"
       />
     </div>
@@ -52,9 +54,11 @@ import { useUserStore } from '@/stores/userStore'
 import { useConfigurationStore } from '@/stores/configurationStore'
 import { FwbFooter } from 'flowbite-vue'
 import { useEventListener } from '@vueuse/core'
+import { useLeaguesStore } from '@/stores/leaguesStore'
 
 const userStore = useUserStore()
 const configurationStore = useConfigurationStore()
+const leaguesStore = useLeaguesStore()
 
 const windowWidth = ref(window.innerWidth)
 const isDrawerOpen = ref(false)
@@ -77,6 +81,7 @@ onMounted(async () => {
   await configurationStore.initializeConfigurationValues()
   await userStore.initalizeUser()
   await userStore.setAdminStatus()
+  await leaguesStore.getLeagues()
 })
 
 async function handleLogin() {

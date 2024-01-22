@@ -4,7 +4,8 @@ export interface League {
   leagueName: string
   leagueStartDate: Date
   leagueEndDate: Date
-  leagueSignUps: LeagueAssignedUser[]
+  leagueSignUps: LeagueAssignedUser[],
+  leagueStatus: LeagueStatus
 }
 
 export interface LeagueAssignedUser {
@@ -13,4 +14,10 @@ export interface LeagueAssignedUser {
   discordName: string
   discordUserId: string
   id: number
+}
+
+export enum LeagueStatus {
+  Draft = "draft",
+  Started = "started",
+  Completed = "completed",
 }

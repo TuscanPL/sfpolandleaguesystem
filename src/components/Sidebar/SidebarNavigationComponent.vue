@@ -15,7 +15,7 @@
       @click="goTo(routerPaths.leagueStandings)"
     />
     <sidebar-item-component
-      v-if="featureFlagConfigurationState.isUpcomingMatchesVisible"
+      v-if="featureFlagConfigurationState.isUpcomingMatchesVisible && isAnyLeagueActive"
       label="Nadchodzące mecze"
       icon="la-calendar-alt-solid"
       @click="goTo(routerPaths.upcomingMatches)"
@@ -42,7 +42,7 @@
       v-if="isAdmin"
       label="Panel administracyjny"
       icon="la-user-shield-solid"
-      @click="goTo(routerPaths.adminPanel)" 
+      @click="goTo(routerPaths.adminPanel)"
     />
     <sidebar-login-indicator-component
       @logout-clicked="handleLogoutClicked"
@@ -67,6 +67,7 @@ interface Props {
   featureFlagConfigurationState: ConfigurationState
   isMobileView: boolean
   isAdmin: boolean
+  isAnyLeagueActive: boolean
 }
 
 interface Emits {
