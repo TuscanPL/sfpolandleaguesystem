@@ -18,6 +18,7 @@
         <fwb-button
           class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition"
           @click="emits('onCancel')"
+          v-if="isCancelButtonVisible ?? true"
         >
           {{ cancelButtonText }}
         </fwb-button>
@@ -34,7 +35,8 @@ interface Props {
   text: string
   subtext?: string
   confirmButtonText: string
-  cancelButtonText: string
+  cancelButtonText?: string
+  isCancelButtonVisible?: boolean
 }
 
 interface Events {

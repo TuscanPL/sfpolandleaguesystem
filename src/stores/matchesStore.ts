@@ -39,7 +39,7 @@ export const useMatchesStore = defineStore('matches', () => {
             player2Discordid: payload.new.player2_discordid ?? undefined,
             player1Score: payload.new.player1_score,
             player2Score: payload.new.player2_score,
-            replayIds: payload.new.replay_ids?.split(',') ?? undefined,
+            replayIds: payload.new.replay_ids?.split(',') ?? [],
             matchStatus: payload.new.match_status as MatchStatus
           } as LeagueMatch)
           break
@@ -55,7 +55,7 @@ export const useMatchesStore = defineStore('matches', () => {
             player2Discordid: payload.new.player2_discordid ?? undefined,
             player1Score: payload.new.player1_score,
             player2Score: payload.new.player2_score,
-            replayIds: payload.new.replay_ids?.split(',') ?? undefined,
+            replayIds: payload.new.replay_ids?.split(',') ?? [],
             matchStatus: payload.new.match_status as MatchStatus
           } as LeagueMatch
           break
@@ -96,7 +96,7 @@ export const useMatchesStore = defineStore('matches', () => {
         player2Discordid: match.player2_discordid ?? undefined,
         player1Score: match.player1_score,
         player2Score: match.player2_score,
-        replayIds: match.replay_ids?.split(',') ?? undefined,
+        replayIds: match.replay_ids?.split(',') ?? [],
         matchStatus: match.match_status as MatchStatus
       }
     })
@@ -139,7 +139,8 @@ export const useMatchesStore = defineStore('matches', () => {
         player2_discordid: match.player2Discordid,
         player1_score: match.player1Score,
         player2_score: match.player2Score,
-        match_status: match.matchStatus
+        match_status: match.matchStatus,
+        replay_ids: match.replayIds?.join(',')
       } as TablesInsert<'league_matches'>)
       .eq('id', match.id)
 
