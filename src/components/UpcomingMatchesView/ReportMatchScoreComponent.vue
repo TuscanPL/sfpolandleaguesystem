@@ -26,13 +26,13 @@
         :disabled="!isMatchStarted"
         type="number"
         v-model="player1Score"
-        :label="getPlayerNameLabel(player1Name)"
+        :label="getPlayerNameLabel(player1Data?.playerName)"
       />
       <fwb-input
         :disabled="!isMatchStarted"
         type="number"
         v-model="player2Score"
-        :label="getPlayerNameLabel(player2Name)"
+        :label="getPlayerNameLabel(player2Data?.playerName)"
       />
     </div>
     <div class="w-full flex mt-10">
@@ -73,12 +73,13 @@
 <script setup lang="ts">
 import ConfirmationModalComponent from '@/components/common/ConfirmationModalComponent.vue'
 import { MatchStatus, type LeagueMatch } from '@/models/app/matchModel'
+import type { PlayerScoreStubModel } from '@/models/app/playerScoreStubModel'
 import { FwbButton, FwbInput, FwbBadge } from 'flowbite-vue'
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 
 interface Props {
-  player1Name: string
-  player2Name: string
+  player1?: PlayerScoreStubModel
+  player2?: PlayerScoreStubModel
   match?: LeagueMatch
 }
 
@@ -89,6 +90,8 @@ interface Emits {
 const props = defineProps<Props>()
 const emits = defineEmits<Emits>()
 
+const player1Data = ref<PlayerScoreStubModel>()
+const player2Data = ref<PlayerScoreStubModel>()
 const player1Score = ref('0')
 const player2Score = ref('0')
 const replayIds = ref<string>()
@@ -112,11 +115,30 @@ const isMatchStarted = computed(() => {
 
 onMounted(() => {
   editingMatch.value = props.match
-  player1Score.value = props?.match?.player1Score.toString() ?? '0'
-  player2Score.value = props?.match?.player2Score.toString() ?? '0'
+  player1Data.value = props.player1
+  player2Data.value = props.player2
+
+  player1Score.value = props.player1?.playerScore?.toString() ?? '0'
+  player2Score.value = props.player2?.playerScore?.toString() ?? '0'
 })
 
-function getPlayerNameLabel(playerName: string): string {
+watch(player1Score, () => {
+  if (!player1Data.value) {
+    return
+  }
+
+  player1Data.value.playerScore = parseInt(player1Score.value)
+})
+
+watch(player2Score, () => {
+  if (!player2Data.value) {
+    return
+  }
+
+  player2Data.value.playerScore = parseInt(player2Score.value)
+})
+
+function getPlayerNameLabel(playerName?: string): string {
   return `${playerName} (Wynik)`
 }
 
@@ -133,12 +155,24 @@ function setMatchEnded(): void {
     return
   }
 
-  editingMatch.value.player1Score = parseInt(player1Score.value)
-  editingMatch.value.player2Score = parseInt(player2Score.value)
-
+  assignPlayerScoreOnMatchEnded()
   determineMatchState()
 
   emits('onUpdateMatch', editingMatch.value)
+
+  function assignPlayerScoreOnMatchEnded(): void {
+    if (!editingMatch.value || !player1Data.value || !player2Data.value) {
+      return
+    }
+
+    if (player1Data.value.playerDiscordId === editingMatch.value.player1Discordid) {
+      editingMatch.value.player1Score = player1Data.value.playerScore ?? 0
+      editingMatch.value.player2Score = player2Data.value.playerScore ?? 0
+    } else {
+      editingMatch.value.player2Score = player1Data.value.playerScore ?? 0
+      editingMatch.value.player1Score = player2Data.value.playerScore ?? 0
+    }
+  }
 }
 
 function addReplayIds(): void {

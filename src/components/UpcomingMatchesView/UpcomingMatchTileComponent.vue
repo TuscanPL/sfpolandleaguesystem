@@ -1,8 +1,6 @@
 <template>
   <div class="flex w-full relative mt-2" @click="openReportScoresModal">
-    <div
-      class="flex p-10 rounded-[3rem] bg-gradient-to-tr from-gray-300 hover:shadow-lg hover:cursor-pointer transition duration-300 ease-in-out items-center justify-between w-full"
-    >
+    <div :class="tileClass">
       <span>{{ versusPlayerName }}</span>
       <span>{{ getMatchStatusTranslation(match?.matchStatus) }}</span>
     </div>
@@ -14,8 +12,8 @@
     <template #body>
       <report-match-score-component
         :match="currentMatch"
-        :player1-name="getPlayerNameByDiscordId(props.currentUser?.userId, props.leagueSignUps)"
-        :player2-name="versusPlayerName"
+        :player1="loggedInPlayerStub"
+        :player2="versusPlayerStub"
         @on-update-match="onUpdateMatch"
       />
     </template>
@@ -24,12 +22,13 @@
 <script setup lang="ts">
 import { getPlayerNameByDiscordId } from '@/common/tournamentUtils'
 import type { LeagueAssignedUser } from '@/models/app/leagueModel'
-import type { LeagueMatch } from '@/models/app/matchModel'
+import { MatchStatus, type LeagueMatch } from '@/models/app/matchModel'
 import type { User } from '@/models/app/userModel'
 import { computed, onMounted, ref } from 'vue'
 import { getMatchStatusTranslation } from '@/common/utils'
 import ReportMatchScoreComponent from './ReportMatchScoreComponent.vue'
 import { FwbModal } from 'flowbite-vue'
+import type { PlayerScoreStubModel } from '@/models/app/playerScoreStubModel'
 
 interface Props {
   match?: LeagueMatch
@@ -46,6 +45,8 @@ const emits = defineEmits<Emits>()
 
 const isReportScoresCardVisible = ref(false)
 const currentMatch = ref<LeagueMatch>()
+const loggedInPlayerStub = ref<PlayerScoreStubModel>()
+const versusPlayerStub = ref<PlayerScoreStubModel>()
 
 const versusPlayerName = computed(() => {
   return props.currentUser?.userId === props.match?.player1Discordid
@@ -53,9 +54,27 @@ const versusPlayerName = computed(() => {
     : getPlayerNameByDiscordId(props.match?.player1Discordid, props.leagueSignUps)
 })
 
+const tileClass = computed(() => {
+  return `flex p-10 rounded-[3rem] bg-gradient-to-tr ${determineGradientColor()} hover:shadow-lg hover:cursor-pointer transition duration-300 ease-in-out items-center justify-between w-full`
+})
+
 onMounted(() => {
   currentMatch.value = props.match
+  loggedInPlayerStub.value = getLoggedInPlayerStub()
+  versusPlayerStub.value = getVersusPlayerStub()
 })
+
+function getLoggedInPlayerStub(): PlayerScoreStubModel {
+  return props.currentUser?.userId === props.match?.player1Discordid
+    ? getPlayerStub(currentMatch.value?.player1Discordid, currentMatch.value?.player1Score)
+    : getPlayerStub(currentMatch.value?.player2Discordid, currentMatch.value?.player2Score)
+}
+
+function getVersusPlayerStub(): PlayerScoreStubModel {
+  return props.currentUser?.userId === props.match?.player1Discordid
+    ? getPlayerStub(props.match?.player2Discordid, props.match?.player2Score)
+    : getPlayerStub(props.match?.player1Discordid, props.match?.player1Score)
+}
 
 function openReportScoresModal(): void {
   isReportScoresCardVisible.value = true
@@ -67,5 +86,42 @@ function closeReportScoresModal(): void {
 
 function onUpdateMatch(match: LeagueMatch): void {
   emits('onUpdateMatch', match)
+}
+
+function getPlayerStub(discordId?: string, score?: number): PlayerScoreStubModel {
+  if (discordId === undefined || score === undefined) {
+    return {
+      playerDiscordId: '',
+      playerScore: 0
+    }
+  }
+
+  return {
+    playerDiscordId: discordId,
+    playerName: getPlayerNameByDiscordId(discordId, props.leagueSignUps),
+    playerScore: score
+  }
+}
+
+function determineGradientColor() {
+  if (!currentMatch.value || currentMatch.value?.matchStatus !== MatchStatus.completed) {
+    return 'from-gray-300'
+  }
+
+  return getWinningPlayerId() === props.currentUser?.userId ? 'from-green-300' : 'from-red-300'
+
+  function getWinningPlayerId(): string | undefined {
+    if (
+      currentMatch.value === undefined ||
+      !currentMatch.value?.player1Score === undefined ||
+      !currentMatch.value?.player2Score === undefined
+    ) {
+      return undefined
+    }
+
+    return currentMatch.value.player1Score > currentMatch.value.player2Score
+      ? currentMatch.value.player1Discordid
+      : currentMatch.value.player2Discordid
+  }
 }
 </script>
