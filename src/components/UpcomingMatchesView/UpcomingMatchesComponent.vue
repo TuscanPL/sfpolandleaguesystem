@@ -2,11 +2,11 @@
   <div class="w-4/5 mx-auto mt-3">
     <upcoming-match-tile-component
       v-for="match in leagueMatches"
-      class="mt-2"
       :key="match.id"
       :match="match"
       :league-sign-ups="leagueSignUps"
       :current-user="currentUser"
+      @on-update-match="onUpdateMatch"
     />
   </div>
 </template>
@@ -22,5 +22,14 @@ interface Props {
   currentUser?: User | null
 }
 
+interface Emits {
+  (event: 'onUpdateMatch', match: LeagueMatch): void
+}
+
 defineProps<Props>()
+const emits = defineEmits<Emits>()
+
+function onUpdateMatch(match: LeagueMatch): void {
+  emits('onUpdateMatch', match)
+}
 </script>

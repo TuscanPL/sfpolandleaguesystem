@@ -6,6 +6,7 @@
       :league-matches="getPlayerMatchesByLeagueAndUser(league.id)"
       :current-user="userStore.user"
       :league-sign-ups="league.leagueSignUps"
+      @on-update-match="onUpdateMatch"
     />
   </div>
 </template>
@@ -15,6 +16,7 @@ import { useMatchesStore } from '@/stores/matchesStore'
 import { useLeaguesStore } from '@/stores/leaguesStore'
 import { onMounted } from 'vue'
 import { useUserStore } from '@/stores/userStore'
+import type { LeagueMatch } from '@/models/app/matchModel'
 
 const matchesStore = useMatchesStore()
 const leaguesStore = useLeaguesStore()
@@ -34,4 +36,8 @@ onMounted(async () => {
   await leaguesStore.getLeagues()
   await matchesStore.getAllMatches()
 })
+
+function onUpdateMatch(match: LeagueMatch) {
+  matchesStore.updateLeagueMatch(match)
+}
 </script>

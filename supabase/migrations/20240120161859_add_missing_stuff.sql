@@ -6,8 +6,6 @@ create type "public"."match_status" as enum ('upcoming', 'completed', 'canceled'
 
 alter table "public"."league_matches" alter column match_status type "public"."match_status" using match_status::text::"public"."match_status";
 
-alter table "public"."league_matches" alter column "match_status" set default None;
-
 drop type "public"."match_status__old_version_to_be_dropped";
 
 alter table "public"."league_matches" alter column "match_status" set default 'upcoming'::match_status;
