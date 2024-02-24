@@ -3,7 +3,7 @@
     <upcoming-matches-component
       v-for="league in leaguesStore.leagues"
       :key="league.id"
-      :league-matches="getPlayerMatchesByLeagueAndUser(league.id)"
+      :league-matches="getLoggedInPlayerMatchesByLeague(league.id)"
       :current-user="userStore.user"
       :league-sign-ups="league.leagueSignUps"
       @on-update-match="onUpdateMatch"
@@ -17,19 +17,18 @@ import { useLeaguesStore } from '@/stores/leaguesStore'
 import { onMounted } from 'vue'
 import { useUserStore } from '@/stores/userStore'
 import type { LeagueMatch } from '@/models/app/matchModel'
+import { getPlayerMatchesByLeague } from '@/common/matchesHelper'
 
 const matchesStore = useMatchesStore()
 const leaguesStore = useLeaguesStore()
 const userStore = useUserStore()
 
-function getPlayerMatchesByLeagueAndUser(leagueId: number) {
-  return matchesStore.matches.filter((match) => {
-    return (
-      (match.player1Discordid === userStore.user?.userId ||
-        match.player2Discordid === userStore.user?.userId) &&
-      match.leagueId === leagueId
-    )
-  })
+function getLoggedInPlayerMatchesByLeague(leagueId: number): LeagueMatch[] {
+  if (!userStore.user) {
+    return []
+  }
+
+  return getPlayerMatchesByLeague(leagueId, userStore.user?.userId, matchesStore.matches)
 }
 
 onMounted(async () => {

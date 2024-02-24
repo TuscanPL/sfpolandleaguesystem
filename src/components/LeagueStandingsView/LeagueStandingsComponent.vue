@@ -10,10 +10,25 @@
         <fwb-table-row v-for="user in orderedPlayers" :key="user.id">
           <table-user-cell-component :user="user" />
           <fwb-table-cell>{{ getScoreString(user.discordUserId) }}</fwb-table-cell>
-          <fwb-table-cell>Tu będzie button do historii meczy</fwb-table-cell>
+          <fwb-table-cell>
+            <fwb-button
+              class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition"
+              @click="handleOpenMatchHistoryModal(user)"
+            >
+              Historia meczy
+            </fwb-button>
+          </fwb-table-cell>
         </fwb-table-row>
       </fwb-table-body>
     </fwb-table>
+    <match-history-modal-component
+      :is-open="isMatchHistoryOpen"
+      :current-player="currentPlayer"
+      :league-id="props.league.id"
+      :matches="props.leagueMatches"
+      :players="props.league.leagueSignUps"
+      @on-close="handleCloseMatchHistoryModal"
+    />
   </div>
 </template>
 <script setup lang="ts">
@@ -24,11 +39,13 @@ import {
   FwbTableHeadCell,
   FwbTableRow,
   FwbTableCell,
-  FwbTableBody
+  FwbTableBody,
+  FwbButton
 } from 'flowbite-vue'
-import type { League } from '@/models/app/leagueModel'
+import type { League, LeagueAssignedUser } from '@/models/app/leagueModel'
 import { MatchStatus, type LeagueMatch } from '@/models/app/matchModel'
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
+import MatchHistoryModalComponent from './MatchHistoryModalComponent.vue'
 
 interface Props {
   league: League
@@ -37,6 +54,9 @@ interface Props {
 
 const props = defineProps<Props>()
 const noMatchesPlayed = 'Brak rozegranych meczy'
+
+const isMatchHistoryOpen = ref(false)
+const currentPlayer = ref<LeagueAssignedUser>()
 
 const orderedPlayers = computed(() => {
   return props.league.leagueSignUps.slice().sort((a, b) => {
@@ -84,5 +104,14 @@ function isMatchLost(userId: string, match: LeagueMatch): boolean {
   return match.player1Discordid === userId
     ? match.player1Score < match.player2Score
     : match.player2Score < match.player1Score
+}
+
+function handleOpenMatchHistoryModal(user: LeagueAssignedUser): void {
+  currentPlayer.value = user
+  isMatchHistoryOpen.value = true
+}
+
+function handleCloseMatchHistoryModal(): void {
+  isMatchHistoryOpen.value = false
 }
 </script>

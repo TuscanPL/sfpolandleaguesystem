@@ -47,16 +47,20 @@ const replayIds = ref('')
 const matchStatus = ref('')
 const matchStatusOptions = [
   {
-    value: MatchStatus.Upcoming,
+    value: MatchStatus.upcoming,
     name: 'Nadchodzący'
   },
   {
-    value: MatchStatus.Completed,
+    value: MatchStatus.completed,
     name: 'Zakończony'
   },
   {
-    value: MatchStatus.Cancelled,
+    value: MatchStatus.cancelled,
     name: 'Anulowany'
+  },
+  {
+    value: MatchStatus.in_progress,
+    name: 'W trakcie'
   }
 ]
 
