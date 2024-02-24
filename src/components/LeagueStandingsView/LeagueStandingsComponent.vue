@@ -3,7 +3,7 @@
     <fwb-table>
       <fwb-table-head>
         <fwb-table-head-cell>Nick</fwb-table-head-cell>
-        <fwb-table-head-cell>Punkty</fwb-table-head-cell>
+        <fwb-table-head-cell>Wygrane - Przegrane</fwb-table-head-cell>
         <fwb-table-head-cell style="text-align: right">Mecze</fwb-table-head-cell>
       </fwb-table-head>
       <fwb-table-body>
@@ -71,7 +71,7 @@ function getScoreString(userId: string): string {
     return noMatchesPlayed
   }
 
-  return `${wins}-${losses}`
+  return `${wins} - ${losses}`
 }
 
 function isMatchWon(userId: string, match: LeagueMatch): boolean {
