@@ -6,14 +6,7 @@
     </fwb-table-head>
     <fwb-table-body>
       <fwb-table-row v-for="user in signedUpUsers" :key="user.id">
-        <fwb-table-cell style="text-align: left">
-          <div class="row inline-flex justify-start items-center">
-            <fwb-avatar class="flex-shrink-0" rounded :img="user.avatarUrl" />
-            <span class="ml-3 overflow-hidden overflow-ellipsis">
-              {{ user.discordName }}
-            </span>
-          </div>
-        </fwb-table-cell>
+        <table-user-cell-component :user="user" />
         <fwb-table-cell>
           {{ getTimeString(user.createdAt) }}
         </fwb-table-cell>
@@ -29,9 +22,9 @@ import {
   FwbTableHeadCell,
   FwbTableRow,
   FwbTableCell,
-  FwbTableBody,
-  FwbAvatar
+  FwbTableBody
 } from 'flowbite-vue'
+import TableUserCellComponent from '@/components/common/TableUserCellComponent.vue'
 import { getTimeString } from '@/common/utils'
 
 interface Props {
