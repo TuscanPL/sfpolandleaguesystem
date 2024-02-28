@@ -43,9 +43,10 @@ import {
   FwbButton
 } from 'flowbite-vue'
 import type { League, LeagueAssignedUser } from '@/models/app/leagueModel'
-import { MatchStatus, type LeagueMatch } from '@/models/app/matchModel'
+import { type LeagueMatch } from '@/models/app/matchModel'
 import { computed, ref } from 'vue'
 import MatchHistoryModalComponent from './MatchHistoryModalComponent.vue'
+import { getPlayerMatches, getWonMatches, getLostMatches } from '@/common/matchesHelper'
 
 interface Props {
   league: League
@@ -69,41 +70,16 @@ const orderedPlayers = computed(() => {
   })
 })
 
-function getPlayerMatches(userId: string): LeagueMatch[] {
-  return props.leagueMatches.filter((match) => {
-    return (
-      match.leagueId === props.league.id &&
-      (match.player1Discordid === userId || match.player2Discordid === userId)
-    )
-  })
-}
-
 function getScoreString(userId: string): string {
-  const wins = getPlayerMatches(userId).filter((match) => {
-    return match.matchStatus === MatchStatus.completed && isMatchWon(userId, match)
-  }).length
-
-  const losses = getPlayerMatches(userId).filter((match) => {
-    return match.matchStatus === MatchStatus.completed && isMatchLost(userId, match)
-  }).length
+  const playerMatches = getPlayerMatches(userId, props.league.id, props.leagueMatches)
+  const wins = getWonMatches(userId, playerMatches).length
+  const losses = getLostMatches(userId, playerMatches).length
 
   if (wins === 0 && losses === 0) {
     return noMatchesPlayed
   }
 
   return `${wins} - ${losses}`
-}
-
-function isMatchWon(userId: string, match: LeagueMatch): boolean {
-  return match.player1Discordid === userId
-    ? match.player1Score > match.player2Score
-    : match.player2Score > match.player1Score
-}
-
-function isMatchLost(userId: string, match: LeagueMatch): boolean {
-  return match.player1Discordid === userId
-    ? match.player1Score < match.player2Score
-    : match.player2Score < match.player1Score
 }
 
 function handleOpenMatchHistoryModal(user: LeagueAssignedUser): void {
