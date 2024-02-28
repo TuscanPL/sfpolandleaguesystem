@@ -151,7 +151,7 @@ function setMatchStarted(): void {
 }
 
 function setMatchEnded(): void {
-  if (!editingMatch.value || !isReplayAmountOver9()) {
+  if (!editingMatch.value) {
     return
   }
 
@@ -245,12 +245,16 @@ function determineMatchState() {
     return
   }
 
-  if (Math.abs(player1ScoreTemp - player2ScoreTemp) >= 2 && !isAnyScoreOver7()) {
+  if (
+    Math.abs(player1ScoreTemp - player2ScoreTemp) >= 2 &&
+    isAnyScoreOver7() &&
+    isReplayAmountOver9()
+  ) {
     editingMatch.value.matchStatus = MatchStatus.completed
     return
   }
 
-  if (player1ScoreTemp === 10 || player2ScoreTemp === 10) {
+  if ((player1ScoreTemp === 10 || player2ScoreTemp === 10) && isReplayAmountOver9()) {
     editingMatch.value.matchStatus = MatchStatus.completed
     return
   }
