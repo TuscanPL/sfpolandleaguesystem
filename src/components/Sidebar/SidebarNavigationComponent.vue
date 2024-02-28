@@ -9,7 +9,7 @@
       @click="goTo(routerPaths.home)"
     />
     <sidebar-item-component
-      v-if="featureFlagConfigurationState.isLeaguePageVisible"
+      v-if="featureFlagConfigurationState.isLeaguePageVisible && isAnyLeagueActive"
       label="Liga"
       icon="la-fist-raised-solid"
       @click="goTo(routerPaths.leagueStandings)"

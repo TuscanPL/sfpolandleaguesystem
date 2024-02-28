@@ -132,16 +132,31 @@ export const useMatchesStore = defineStore('matches', () => {
   }
 
   async function updateLeagueMatch(match: LeagueMatch): Promise<void> {
+    interface MatchDTO {
+      player1_discordid: string | undefined
+      player2_discordid: string | undefined
+      player1_score: number
+      player2_score: number
+      match_status: MatchStatus
+      replay_ids: string | null
+    }
+
+    const matchDTO: MatchDTO = {
+      player1_discordid: match.player1Discordid,
+      player2_discordid: match.player2Discordid,
+      player1_score: match.player1Score,
+      player2_score: match.player2Score,
+      match_status: match.matchStatus,
+      replay_ids: null
+    }
+
+    if (match.replayIds && match.replayIds.length > 0) {
+      matchDTO.replay_ids = match.replayIds.join(',')
+    }
+
     const leagueMatchesQuery = supabase
       .from('league_matches')
-      .update({
-        player1_discordid: match.player1Discordid,
-        player2_discordid: match.player2Discordid,
-        player1_score: match.player1Score,
-        player2_score: match.player2Score,
-        match_status: match.matchStatus,
-        replay_ids: match.replayIds?.join(',')
-      } as TablesInsert<'league_matches'>)
+      .update(matchDTO as TablesInsert<'league_matches'>)
       .eq('id', match.id)
 
     const { error } = await leagueMatchesQuery
