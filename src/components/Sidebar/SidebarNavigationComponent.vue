@@ -9,13 +9,13 @@
       @click="goTo(routerPaths.home)"
     />
     <sidebar-item-component
-      v-if="featureFlagConfigurationState.isLeaguePageVisible && isAnyLeagueActive"
+      v-if="featureFlagConfigurationState.isLeaguePageVisible && isAnyLeagueActive && user"
       label="Liga"
       icon="la-fist-raised-solid"
       @click="goTo(routerPaths.leagueStandings)"
     />
     <sidebar-item-component
-      v-if="featureFlagConfigurationState.isUpcomingMatchesVisible && isAnyLeagueActive"
+      v-if="featureFlagConfigurationState.isUpcomingMatchesVisible && isAnyLeagueActive && user"
       label="Nadchodzące mecze"
       icon="la-calendar-alt-solid"
       @click="goTo(routerPaths.upcomingMatches)"
