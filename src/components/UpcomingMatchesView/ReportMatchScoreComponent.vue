@@ -76,6 +76,7 @@ import { MatchStatus, type LeagueMatch } from '@/models/app/matchModel'
 import type { PlayerScoreStubModel } from '@/models/app/playerScoreStubModel'
 import { FwbButton, FwbInput, FwbBadge } from 'flowbite-vue'
 import { computed, onMounted, ref, watch } from 'vue'
+import { useToast } from 'vue-toastification'
 
 interface Props {
   player1?: PlayerScoreStubModel
@@ -89,6 +90,7 @@ interface Emits {
 
 const props = defineProps<Props>()
 const emits = defineEmits<Emits>()
+const toast = useToast()
 
 const player1Data = ref<PlayerScoreStubModel>()
 const player2Data = ref<PlayerScoreStubModel>()
@@ -148,6 +150,7 @@ function setMatchStarted(): void {
   }
 
   editingMatch.value.matchStatus = MatchStatus.in_progress
+  toast.success('Mecz rozpoczęty!')
 }
 
 function setMatchEnded(): void {
@@ -156,7 +159,13 @@ function setMatchEnded(): void {
   }
 
   assignPlayerScoreOnMatchEnded()
-  determineMatchState()
+  const isSuccess = determineMatchState()
+
+  if (isSuccess) {
+    editingMatch.value.matchStatus === MatchStatus.completed
+      ? toast.success('Mecz zakończony!')
+      : toast.info('Mecz zapisany.')
+  }
 
   emits('onUpdateMatch', editingMatch.value)
 
@@ -175,12 +184,20 @@ function setMatchEnded(): void {
   }
 }
 
-function isReplayAmountOver9(): boolean {
+function isReplayAmountOver7(): boolean {
+  const notEnoughReplaysErrorMessage = 'Zapisujesz mniej niż 7 powtórek!'
   if (!editingMatch.value || !editingMatch.value.replayIds) {
+    toast.error(notEnoughReplaysErrorMessage)
+
     return false
   }
 
-  return editingMatch.value?.replayIds?.length >= 9
+  const isOver7 = editingMatch.value.replayIds.length >= 7
+  if (!isOver7) {
+    toast.error(notEnoughReplaysErrorMessage)
+  }
+
+  return isOver7
 }
 
 function addReplayIds(): void {
@@ -207,6 +224,7 @@ function removeReplayId(replayId: string): void {
     !editingMatch?.value?.replayIds ||
     editingMatch.value.matchStatus !== MatchStatus.in_progress
   ) {
+    toast.error('Mecz nie jest w trakcie.')
     return
   }
 
@@ -232,9 +250,9 @@ function onCloseConfirmationModal(): void {
   incorrectReplayIds.value = []
 }
 
-function determineMatchState() {
+function determineMatchState(): boolean {
   if (!editingMatch.value) {
-    return
+    return false
   }
 
   const player1ScoreTemp = editingMatch.value.player1Score
@@ -242,27 +260,26 @@ function determineMatchState() {
 
   if (player1ScoreTemp < 7 && player2ScoreTemp < 7) {
     editingMatch.value.matchStatus = MatchStatus.in_progress
-    return
+    return true
   }
 
-  if (
-    Math.abs(player1ScoreTemp - player2ScoreTemp) >= 2 &&
-    isAnyScoreOver7() &&
-    isReplayAmountOver9()
-  ) {
+  if (!isReplayAmountOver7()) return false
+
+  if (Math.abs(player1ScoreTemp - player2ScoreTemp) >= 2 && isAnyScoreOver7()) {
     editingMatch.value.matchStatus = MatchStatus.completed
-    return
+    return true
   }
 
-  if ((player1ScoreTemp === 10 || player2ScoreTemp === 10) && isReplayAmountOver9()) {
+  if (player1ScoreTemp === 10 || player2ScoreTemp === 10) {
     editingMatch.value.matchStatus = MatchStatus.completed
-    return
+    return true
   }
 
   editingMatch.value.matchStatus = MatchStatus.in_progress
+  return true
 
   function isAnyScoreOver7(): boolean {
-    return player1ScoreTemp > 7 || player2ScoreTemp > 7
+    return player1ScoreTemp >= 7 || player2ScoreTemp >= 7
   }
 }
 </script>
