@@ -5,7 +5,7 @@
       class="w-full bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition"
       disabled
     >
-      <span>Mecz zakończony <v-icon name="la-fist-solid" /></span>
+      <span>Mecz zakończony <v-icon name="la-flag-checkered-solid" /></span>
     </fwb-button>
     <fwb-button
       v-else-if="match?.matchStatus === MatchStatus.upcoming"
@@ -229,20 +229,20 @@ function determineMatchState() {
     return
   }
 
-  const player1Score = editingMatch.value.player1Score
-  const player2Score = editingMatch.value.player2Score
+  const player1ScoreTemp = editingMatch.value.player1Score
+  const player2ScoreTemp = editingMatch.value.player2Score
 
-  if (player1Score < 7 && player2Score < 7) {
+  if (player1ScoreTemp < 7 && player2ScoreTemp < 7) {
     editingMatch.value.matchStatus = MatchStatus.in_progress
     return
   }
 
-  if (Math.abs(player1Score - player2Score) >= 2 && !isAnyScoreOver7()) {
+  if (Math.abs(player1ScoreTemp - player2ScoreTemp) >= 2 && !isAnyScoreOver7()) {
     editingMatch.value.matchStatus = MatchStatus.completed
     return
   }
 
-  if (player1Score === 10 || player2Score === 10) {
+  if (player1ScoreTemp === 10 || player2ScoreTemp === 10) {
     editingMatch.value.matchStatus = MatchStatus.completed
     return
   }
@@ -250,7 +250,7 @@ function determineMatchState() {
   editingMatch.value.matchStatus = MatchStatus.in_progress
 
   function isAnyScoreOver7(): boolean {
-    return player1Score > 7 || player2Score > 7
+    return player1ScoreTemp > 7 || player2ScoreTemp > 7
   }
 }
 </script>

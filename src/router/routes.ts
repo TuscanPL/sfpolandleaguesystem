@@ -28,8 +28,7 @@ const routes = [
   {
     path: routerPaths.leagueStandings,
     name: 'leagueStandings',
-    component: leagueStandings,
-    redirect: { name: 'signUp' }
+    component: leagueStandings
   },
   {
     path: routerPaths.reportScores,

@@ -29,6 +29,7 @@ import { getMatchStatusTranslation } from '@/common/utils'
 import ReportMatchScoreComponent from './ReportMatchScoreComponent.vue'
 import { FwbModal } from 'flowbite-vue'
 import type { PlayerScoreStubModel } from '@/models/app/playerScoreStubModel'
+import { getOpposingPlayerName, getWinningPlayerId } from '@/common/matchesHelper'
 
 interface Props {
   match?: LeagueMatch
@@ -49,9 +50,11 @@ const loggedInPlayerStub = ref<PlayerScoreStubModel>()
 const versusPlayerStub = ref<PlayerScoreStubModel>()
 
 const versusPlayerName = computed(() => {
-  return props.currentUser?.userId === props.match?.player1Discordid
-    ? getPlayerNameByDiscordId(props.match?.player2Discordid, props.leagueSignUps)
-    : getPlayerNameByDiscordId(props.match?.player1Discordid, props.leagueSignUps)
+  if (!props.currentUser || !currentMatch.value || !props.leagueSignUps) {
+    return ''
+  }
+
+  return getOpposingPlayerName(props.currentUser?.userId, currentMatch.value, props.leagueSignUps)
 })
 
 const tileClass = computed(() => {
@@ -108,20 +111,8 @@ function determineGradientColor() {
     return 'from-gray-300'
   }
 
-  return getWinningPlayerId() === props.currentUser?.userId ? 'from-green-300' : 'from-red-300'
-
-  function getWinningPlayerId(): string | undefined {
-    if (
-      currentMatch.value === undefined ||
-      !currentMatch.value?.player1Score === undefined ||
-      !currentMatch.value?.player2Score === undefined
-    ) {
-      return undefined
-    }
-
-    return currentMatch.value.player1Score > currentMatch.value.player2Score
-      ? currentMatch.value.player1Discordid
-      : currentMatch.value.player2Discordid
-  }
+  return getWinningPlayerId(currentMatch.value) === props.currentUser?.userId
+    ? 'from-green-300'
+    : 'from-red-300'
 }
 </script>
