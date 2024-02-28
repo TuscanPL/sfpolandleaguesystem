@@ -1,5 +1,5 @@
 <template>
-  <div class="w-4/5 mx-auto mt-3">
+  <div class="w-4/5 mx-auto mt-3 last-match-spacer">
     <upcoming-match-tile-component
       v-for="match in sortedLeagueMatches"
       :key="match.id"
@@ -53,3 +53,8 @@ function onUpdateMatch(match: LeagueMatch): void {
   emits('onUpdateMatch', match)
 }
 </script>
+<style scoped>
+.last-match-spacer:last-child {
+  margin-bottom: 0.75rem;
+}
+</style>
