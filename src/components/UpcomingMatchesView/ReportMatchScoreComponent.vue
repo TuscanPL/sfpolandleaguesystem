@@ -51,12 +51,12 @@
         <v-icon name="la-plus-solid" />
       </fwb-button>
     </div>
-    <div v-if="isBadgeSectionVisible" class="w-full flex mt-3">
+    <div v-if="isBadgeSectionVisible" class="w-full flex mt-3 flex-wrap">
       <fwb-badge
         v-bind:key="replayId"
         v-for="replayId in match?.replayIds"
         @click="removeReplayId(replayId)"
-        class="hover:shadow-lg hover:cursor-pointer transition duration-300 ease-in-out"
+        class="mt-3 hover:shadow-lg hover:cursor-pointer transition duration-300 ease-in-out"
       >
         {{ replayId }}
       </fwb-badge>
@@ -151,7 +151,7 @@ function setMatchStarted(): void {
 }
 
 function setMatchEnded(): void {
-  if (!editingMatch.value) {
+  if (!editingMatch.value || !isReplayAmountOver9()) {
     return
   }
 
@@ -173,6 +173,14 @@ function setMatchEnded(): void {
       editingMatch.value.player1Score = player2Data.value.playerScore ?? 0
     }
   }
+}
+
+function isReplayAmountOver9(): boolean {
+  if (!editingMatch.value || !editingMatch.value.replayIds) {
+    return false
+  }
+
+  return editingMatch.value?.replayIds?.length >= 9
 }
 
 function addReplayIds(): void {
