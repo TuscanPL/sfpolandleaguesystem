@@ -28,7 +28,7 @@
         <fwb-badge
           v-if="!isUserSignedUp"
           type="green"
-          class="rounded-full p-1 text-sm w-full hover:bg-green-200 hover:shadow-md hover:cursor-pointer transition"
+          :class="getSigningBadgeClass('hover:bg-green-200')"
           @click="handleLeagueSignUpCallback"
         >
           <template #icon>
@@ -39,7 +39,7 @@
         <fwb-badge
           v-else
           type="red"
-          class="rounded-full p-1 text-sm w-full hover:bg-red-200 hover:shadow-md hover:cursor-pointer transition"
+          :class="getSigningBadgeClass('hover:bg-red-200')"
           @click="handleLeagueSignOutCallback"
         >
           <template #icon>
@@ -57,7 +57,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import type { League } from '@/models/app/leagueModel'
+import { LeagueStatus, type League } from '@/models/app/leagueModel'
 import type { User } from '@/models/app/userModel'
 import { FwbBadge } from 'flowbite-vue'
 import { computed } from 'vue'
@@ -91,11 +91,27 @@ const isUserLoggedIn = computed(() => {
   return Object.keys(props.user).length > 0
 })
 
+const isSigningDisabled = computed(() => {
+  return props.league.leagueStatus === LeagueStatus.Started
+})
+
+function getSigningBadgeClass(hoverColor: string) {
+  return `rounded-full p-1 text-sm w-full transition ${
+    !isSigningDisabled.value
+      ? `hover:shadow-md hover:cursor-pointer ${hoverColor}`
+      : 'bg-gray-100 hover:bg-gray-200 text-gray-500 cursor-not-allowed'
+  } `
+}
+
 function handleLeagueSignUpCallback() {
+  if (isSigningDisabled.value) return
+
   emits('league-sign-up-clicked')
 }
 
 function handleLeagueSignOutCallback() {
+  if (isSigningDisabled.value) return
+
   emits('league-sign-out-clicked')
 }
 </script>
