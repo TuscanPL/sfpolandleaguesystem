@@ -2,7 +2,7 @@
   <div class="flex w-full relative mt-2" @click="openReportScoresModal">
     <div :class="tileClass">
       <span>{{ versusPlayerName }}</span>
-      <span>{{ getMatchStatusTranslation(match?.matchStatus) }}</span>
+      <span>{{ matchStatusTranslationLabel }}</span>
     </div>
   </div>
   <fwb-modal v-if="isReportScoresCardVisible" @close="closeReportScoresModal">
@@ -55,6 +55,10 @@ const versusPlayerName = computed(() => {
   }
 
   return getOpposingPlayerName(props.currentUser?.userId, currentMatch.value, props.leagueSignUps)
+})
+
+const matchStatusTranslationLabel = computed(() => {
+  return getMatchStatusTranslation(props.match?.matchStatus)
 })
 
 const tileClass = computed(() => {
