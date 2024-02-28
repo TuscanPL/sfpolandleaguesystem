@@ -79,3 +79,65 @@ export function getLostMatches(userId: string, matches: LeagueMatch[]): LeagueMa
     (match) => match.matchStatus === MatchStatus.completed && isMatchLost(userId, match)
   )
 }
+
+export function getWonMatchesPointsDifferential(
+  userId: string,
+  matches: LeagueMatch[],
+  leagueId: number
+): number {
+  const wonMatches = getWonMatches(userId, getPlayerMatches(userId, leagueId, matches))
+  let differential = 0
+
+  for (const match of wonMatches) {
+    differential += Math.abs(match.player1Score - match.player2Score)
+  }
+
+  return differential
+}
+
+export function getWonMatchesDifferential(
+  userId: string,
+  matches: LeagueMatch[],
+  leagueId: number
+): number {
+  const wonMatches = getWonMatches(userId, getPlayerMatches(userId, leagueId, matches))
+  const lostMatches = getLostMatches(userId, getPlayerMatches(userId, leagueId, matches))
+
+  return Math.abs(wonMatches.length - lostMatches.length)
+}
+
+export function sortMatchesByPoints(
+  a: LeagueAssignedUser,
+  b: LeagueAssignedUser,
+  leagueMatches: LeagueMatch[],
+  leagueId: number
+): number {
+  const aPlayerWonMatchesDifferential = getWonMatchesDifferential(
+    a.discordUserId,
+    leagueMatches,
+    leagueId
+  )
+
+  const bPlayerWonMatchesDifferential = getWonMatchesDifferential(
+    b.discordUserId,
+    leagueMatches,
+    leagueId
+  )
+
+  if (aPlayerWonMatchesDifferential !== bPlayerWonMatchesDifferential) {
+    return aPlayerWonMatchesDifferential > bPlayerWonMatchesDifferential ? -1 : 1
+  }
+
+  const aPlayerWonRoundsAmount = getWonMatchesPointsDifferential(
+    a.discordUserId,
+    leagueMatches,
+    leagueId
+  )
+  const bPlayerWonRoundsAmount = getWonMatchesPointsDifferential(
+    b.discordUserId,
+    leagueMatches,
+    leagueId
+  )
+
+  return aPlayerWonRoundsAmount > bPlayerWonRoundsAmount ? -1 : 1
+}

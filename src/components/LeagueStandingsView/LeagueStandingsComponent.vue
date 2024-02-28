@@ -46,7 +46,12 @@ import type { League, LeagueAssignedUser } from '@/models/app/leagueModel'
 import { type LeagueMatch } from '@/models/app/matchModel'
 import { computed, ref } from 'vue'
 import MatchHistoryModalComponent from './MatchHistoryModalComponent.vue'
-import { getPlayerMatches, getWonMatches, getLostMatches } from '@/common/matchesHelper'
+import {
+  getPlayerMatches,
+  getWonMatches,
+  getLostMatches,
+  sortMatchesByPoints
+} from '@/common/matchesHelper'
 
 interface Props {
   league: League
@@ -61,12 +66,7 @@ const currentPlayer = ref<LeagueAssignedUser>()
 
 const orderedPlayers = computed(() => {
   return props.league.leagueSignUps.slice().sort((a, b) => {
-    const comparedScore = getScoreString(b.discordUserId)
-    if (comparedScore === noMatchesPlayed) {
-      return -1
-    }
-
-    return getScoreString(b.discordUserId).localeCompare(getScoreString(a.discordUserId))
+    return sortMatchesByPoints(a, b, props.leagueMatches, props.league.id)
   })
 })
 
